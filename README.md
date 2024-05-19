@@ -1,5 +1,5 @@
 <p align="center">
-  <i>Learn Java, code Minecraft plugins and launch a unique network from the ground up in 20 days (without experience):</i>
+  <small><i>Learn Java, code Minecraft plugins and launch a unique network from the ground up in 20 days (without experience):</i></small>
   <a href="https://mineacademy.org/project-orion?st=github&sc=protect&utm_source=github&utm_medium=overview&utm_campaign=protect">
     <img src="https://i.imgur.com/UjhXkSA.png" />
   </a>
