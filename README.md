@@ -8,7 +8,7 @@ Protect monitors your network activity for uncommon and impossible itemstacks, c
 * X-rayers and other unwished ways to obtain high amount of rare materials quickly.
 * Unbalanced or poorly setup server economy.
 
-You are welcome to read the **[Confiscate Wikipedia](https://github.com/kangarko/Protect/wiki)**, where you will find tons of information about installing, configuring and using this plugin.
+You are welcome to read the **[Protect Wikipedia](https://github.com/kangarko/Protect/wiki)**, where you will find tons of information about installing, configuring and using this plugin.
 
 If you have any **questions or bugs to report**, try seeing if [those can be resolved quickly](https://github.com/kangarko/Protect/wiki/Common-Issues) by yourself. If that does not help, you are welcome to **file an issue**. Please read the [Getting Help the Best Way](https://github.com/kangarko/Protect/wiki/Getting-Help-the-Right-Way) page to obtain help as quickly as possible.
 
