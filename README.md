@@ -1,8 +1,22 @@
+<p align="center">
+  Learn Java, code Minecraft plugins and launch a unique network from the ground up in 20 days (without experience):
+  <a href="https://mineacademy.org/project-orion?st=github&sc=protect&utm_source=github&utm_medium=overview&utm_campaign=protect">
+    <img src="https://i.imgur.com/UjhXkSA.png" />
+  </a>
+</p>
+
 # Protect
+Protect monitors your network activity for uncommon and impossible itemstacks, commands or shop transactions to prevent:
 
-Page under construction.
+* Private, unleaked duplication exploits ruining your network.
+* Network raids that disrupt your server's monetization and lose you money.
+* Abusive or new staff misusing privilegees.
+* "Crash items" used by hacked clients to lag or kick clients.
+* X-rayers and other unwished ways to obtain high amount of rare materials quickly.
+* Unbalanced or poorly setup server economy.
 
-## Important information:
+You are welcome to read the **[Confiscate Wikipedia](https://github.com/kangarko/Protect/wiki)**, where you will find tons of information about installing, configuring and using this plugin.
 
-* We're awaiting approval at https://builtbybit.com/resources/protect-prevent-dupe-exploits.44847
-* Confiscate customers will be offered a free migrate for the next 60 days
+If you have any **questions or bugs to report**, try seeing if [those can be resolved quickly](https://github.com/kangarko/Protect/wiki/Common-Issues) by yourself. If that does not help, you are welcome to **file an issue**. Please read the [Getting Help the Best Way](https://github.com/kangarko/Protect/wiki/Getting-Help-the-Right-Way) page to obtain help as quickly as possible.
+
+Get it here: https://www.mc-market.org/resources/44847/
