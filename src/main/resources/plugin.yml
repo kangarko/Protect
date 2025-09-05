@@ -1,0 +1,15 @@
+name: ${project.artifactId}
+main: ${main.class}
+version: ${project.version}
+api-version: 1.13
+author: kangarko
+softdepend: [LiteBans, AuthMe, BossShop, BlueShop, DiscordSRV, ExcellentShop, EconomyShopGUI, Factions, Feudal, Essentials, ChestShop, LegacyFactions, NashornPlus, Lands, LuckPerms, mcMMO, MVdWPlaceholderAPI, Multiverse-Core, Nicky, PlaceholderAPI, PowerNBT, ProtocolLib, Shop, ShopGUIPlus, SignShop, SimpleClans, Towny, TownyChat, Vault, WorldEdit]
+folia-supported: true
+#
+# The commands are built at runtime so you can change them easily within the settings.
+# Do not change anything in here, you will break the plugin and get no support.
+#
+commands: 
+permissions:
+  protect.bypass.scan: 
+    default: false

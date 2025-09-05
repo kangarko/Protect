@@ -1,0 +1,335 @@
+# !-----------------------------------------------------------------------------------------!
+#                      Welcome to the main configuration of Protect
+# !-----------------------------------------------------------------------------------------!
+#
+# For support and documentation, please see:
+# - https://docs.mineacademy.org/protect
+#
+# For variables you can use in broadcast/discord sections, see:
+# - https://docs.mineacademy.org/protect/variables
+#
+# !-----------------------------------------------------------------------------------------!
+
+# -------------------------------------------------------------------------------------------
+# Configure what triggers the inventory scan.
+# -------------------------------------------------------------------------------------------
+Scan: 
+  
+  # Scan inventories when a player joins?
+  Player_Join: true
+ 
+  # Scan inventories when a player dies?
+  Player_Death: false
+  
+  # Scan on world change? Set to true if you have per-world inventory plugins.
+  World_Change: false
+  
+  # Scan containers (chests, furnaces, enchant tables, etc.) on open? You can configure
+  # exceptions in the section below.
+  Inventory_Open: true
+  
+  # Scan right and left clicking holding the following materials? We use the same logic as
+  # in rules, see rules/main.rs for more info. Available: https://mineacademy.org/material
+  Item_Use: 
+  - POTION
+  - "*_POTION"
+  - "*_SPAWN_EGG"
+  - "FIREWORK_*"
+  
+  # Scan when items are spawned? I.e. dropped by player, dispenser, dropper, another plugin
+  Item_Spawn: false
+   
+  # Scan when players issue the commands below? Matching is case insensitive and uses "starts
+  # with" logic, i.e. /warp home will match /warp home, /warp homeland etc.
+  Command: []
+
+  # Run a period scan? Type time in human readable format, i.e. "1 hour" to scan
+  # every hour, "15 minutes", "60 seconds" or none to disable etc. 
+  Periodic: none
+
+# -------------------------------------------------------------------------------------------
+# Configure global rules when we should ignore scanning inventories.
+# -------------------------------------------------------------------------------------------
+Ignore:
+
+  # False by default; meaning you need to explicitly give staff protect.bypass.scan
+  # permission to make Protect not scan them. If true, any player who is OP is ignored.
+  Ops: false
+  
+  # A list of gamemodes to ignore. Available: SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR  
+  #
+  # Warning: Clients can obtain hacked items and write arbitrary NBT data when in creative
+  # including items crashing the client/server. If you run a creative server, set this to
+  # false and use the "ignore gamemode creative" operator for survival-only rules instead.
+  Gamemodes: []
+    
+  # A list of world names to ignore.
+  Worlds: []
+  
+  # Ignore players who have the given fixed metadata key (Player#hasMetadata(key)).
+  # By default we ignore playing players in CoreArena
+  Metadata_Player: 
+  - CoreArena_Arena
+  
+  # Ignore the following metadata keys for items. There is 1 or two checks:
+  # For dropped items, we also check their temporary metadata, and the one below.
+  # For item stacks, we check persistent data container (MC 1.14+ is required).
+  Metadata_Item:
+  - CoreArena_ExpDrop
+  
+  # Ignore any item having a custom display name. Typically, only third party plugins set this. 
+  # Use "/protect iteminfo meta" to check your item in hand for what it has.
+  #
+  # NB: While this typically prevents items from your plugins from being taken, hacked clients
+  # such as Wursts add custom name to their hacked items. Instead, use the ignore operators
+  # to whitelist only your own items.
+  #
+  # TIP: If you set this to true, set Debug to [scan] to see which items get ignored.
+  Custom_Display_Name: false
+  
+  # Ignore any item having a custom lore. Typically, only third party plugins set this. 
+  # Use "/protect iteminfo meta" to check your item in hand for what it has.
+  #
+  # NB: See Custom_Display_Name for a tip and a warning above.
+  Custom_Lore: true
+  
+  # Ignore items having a custom persistent metadata (requires MC 1.16+). This should prevent
+  # items from custom plugins from being confiscated. You can always alert the developer of your
+  # favorite plugin to add any arbitrary metadata to the item meta to prevent confiscation.
+  Custom_Persistent_Tags: true
+  
+  # Ignore items having a custom model data? Requires MC 1.14+.
+  Custom_Model_Data: true
+  
+  # A list of materials to ignore (exact matches). Available: https://mineacademy.org/material
+  Materials: []
+  
+  # Ignore the following container types (i.e. ANVIL). For available types, see:
+  # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/inventory/InventoryType.html
+  Inventory_Types:
+  - ANVIL
+  
+  # Ignore inventories having the following title names. We remove colors before matching
+  # and use "starts with logic" as in Scan.Command section. Example: "Diamond"
+  Inventory_Titles: 
+  - "Custom Inventory Name"
+
+# -------------------------------------------------------------------------------------------
+# Configure actions for all rules after scan. You can use rule operators to run actions
+# for individual rules, see rules/main.rs for more info.
+# -------------------------------------------------------------------------------------------
+After_Scan: 
+  
+  # Commands that are executed after item is confiscated using "then confiscate" or
+  # "then confiscate excess" as console.
+  #
+  # Variables: {date} for current time and date, {material} for item type
+  #            {player} for the player and {location} for world, x-y-z coordinates
+  #
+  # Example usage:
+  # - 'mail send <yourName> &7[{date}] &6Confiscated {material} from {player} at {location}'
+  Confiscate_Console_Commands: []
+  
+  # Commands run as the player. See above for documentation.
+  Confiscate_Player_Commands: []
+  
+  # Commands run as console on "then clone" operator. See above for documentation.
+  Clone_Console_Commands: []
+  
+  # Commands run the player on "then clone" operator. See above for documentation.
+  Clone_Player_Commands: []
+
+# -------------------------------------------------------------------------------------------
+# Rules settings. We automatically load all .rs files from the rules/ folder.
+#
+# You can setup globla alerts each time any rule matches a given item. For individual alerts,
+# use the "then notify" operator for each rule.
+#
+# Give admins "protect.bypass.scan" to ignore scanning their inventories.
+# -------------------------------------------------------------------------------------------
+Rules: 
+  
+  # Print the '*--------- Rule match (X) for Y ---------' messages into the console?
+  # [TIP] You can hide this per-rule using the "dont verbose" operator.
+  Verbose: true
+
+  # Send a message on a rule match to people with "protect.notify.item" permission?
+  Broadcast: true
+  
+  # The format for the broadcast message. See our GitHub Wiki link above for placeholders.
+  Broadcast_Format: "&8[&c{rule_name}&8] &7{item_amount}x{item_type} for &f{player}"
+  
+  # The discord channel to send the alert to. Set to "none" to disable.
+  Discord_Channel: none
+  
+  # The format for the discord message. See our GitHub Wiki link above for placeholders.
+  Discord_Format: "[{server_name}] [{location}] [{rule_name}] {item_amount}x{item_type} for {player}"
+
+# -------------------------------------------------------------------------------------------
+# Log and get notified when certain commands get executed.
+# This supplements social spy and can catch any plugin.
+# -------------------------------------------------------------------------------------------
+Command_Log:
+  
+  # Enable this section?
+  Enabled: true
+  
+  # If true, the commands below won't run.  
+  Block: false
+  
+  # If blocked, we send a fake no permissions message from the real command. If we can't
+  # find it, we use the following message.
+  Block_Fallback_Message: "&cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error."
+  
+  # Should we broadcast the command to admins with "protect.notify.commandspy" permission?
+  Broadcast: true
+  
+  # The format for the broadcast.
+  # See our GitHub Wiki link above for placeholders. Set to "none" to disable broadcasting.
+  Broadcast_Format: "&8[&d{type}&8]&f {player}&7: {message}"
+  
+  # The discord channel to send the command logs to. Set to "none" to disable.
+  Discord_Channel: none
+  
+  # The format for the discord message. See our GitHub Wiki link above for placeholders.
+  Discord_Format: "[{server_name}] [{type}] [{location}] {player}: {command}"
+  
+  # List of logged commands using regular expressions. Give 'protect.notify.commandspy' to
+  # get notified upon their execution.
+  #
+  # TIP: Regex matching is case insensitive. We'll escape the initial / or //. Example:
+  # - /give (.*) diamond
+  Command_List:
+    - /give
+    - /i
+    - /ban
+    - /tempban
+    - /gm
+    - /gamemode
+    - /op
+
+# -------------------------------------------------------------------------------------------
+# Integration with shop plugins to log ecommerce transactions.
+# Give admins "protect.bypass.transaction" to ignore logging their transactions.
+# 
+# Supported plugins: BlueShop, ChestShop, ExcellentShop, ShopGUI, Shop, SignShop, 
+#                    EconomyShopGUI
+# -------------------------------------------------------------------------------------------
+Transaction_Log: 
+  
+  # Enable this feature? You need to restart the server to apply changes.
+  Enabled: true
+  
+  # Send a message on a transaction to people with "protect.notify.transaction" permission?
+  Broadcast: true
+  
+  # The format for the broadcast message. 
+  # See our GitHub Wiki link above for placeholders. Set to "none" to disable message.
+  Broadcast_Format_Buy: "&8[&d{plugin_name}&8]&f {player} &6bought &f{amount}&7x&f{item_type} from {shop_owner} at &6{price_formatted}"
+  Broadcast_Format_Sell: "&8[&d{plugin_name}&8]&f {player} &6sold &f{amount}&7x&f{item_type} to {shop_owner} at &6{price_formatted}"
+  
+  # The discord channel to send the transaction log to. Set to "none" to disable.
+  Discord_Channel: none
+  
+  # The format for the discord message. See our GitHub Wiki link above for placeholders.
+  # Set to "none" to disable message.
+  Discord_Format_Buy: "[{server_name}] [{location}] [{plugin_name}] {player} bought {amount}x{item_type} from {shop_owner} at {price_formatted}"
+  Discord_Format_Sell: "[{server_name}] [{location}] [{plugin_name}] {player} sold {amount}x{item_type} to {shop_owner} at {price_formatted}"  
+
+# -------------------------------------------------------------------------------------------
+# Integration with WorldEdit. You can prevent staff from using WorldEdit to bypass your rules
+# and control which materials they are allowed to use.
+# -------------------------------------------------------------------------------------------
+WorldEdit:
+  
+  # Enable? Restart your server to apply changes.
+  Enabled: true
+  
+  # Limit WorldEdit operations like //set, //sphere to a maximum amount of changed items to prevent lag.  
+  Total_Limit: 
+    
+    # You can specify different limits for people with different permissions.
+    # Here for example, players having "protect.group.vip" permission are able to set max 1000 blocks in a operation.    
+    vip: 1_000
+    moderators: 20_000
+  
+  # You can specify the max amount of allowed item per operation by prepending the material with '-<amount>'
+  # Example: BEDROCK-128 (That means a player is allowed to set maximum 128x of bedrocks per one operation.)
+  # Not setting max amount means the item will be completely banned.
+  #
+  # If you have Prevent_Crashable_Items enabled, some unsafe technical blocks are included as well.  
+  Block_Limit: [
+    # Block containers that may cause visual glitches and invisible inventories.
+    CHEST, TRAPPED_CHEST, ENDER_CHEST, FURNACE, BURNING_FURNACE, DISPENSER, DROPPER,
+    HOPPER, COMMAND, BEACON, ANVIL, ENCHANTMENT_TABLE, JUKEBOX, STRUCTURE_BLOCK, BREWING_STAND, CAULDRON,
+
+    # Limit unobtainable, creative-only and special items.
+    BEDROCK-512, BARRIER-512, SPONGE, MOB_SPAWNER-8, DAYLIGHT_DETECTOR, ENDER_PORTAL_FRAME, DRAGON_EGG-4, NOTE_BLOCK,
+
+    # Limit most misused luxury items.
+    IRON_BLOCK-128, GOLD_BLOCK-128, REDSTONE_BLOCK-128, LAPIS_BLOCK-128, DIAMOND_BLOCK-64, EMERALD_BLOCK-64, TNT-24,
+    WATER-12, STATIONARY_WATER-12, STATIONARY_LAVA-8, LAVA-8, FIRE-12,
+
+    # Block items that drop when placed in air, and that may freeze the server if set too many.
+    RAILS, POWERED_RAIL, DETECTOR_RAIL, ACTIVATOR_RAIL, LEVER, STONE_BUTTON, WOOD_BUTTON, REDSTONE_TORCH_ON,
+    WOOD_PLATE, IRON_PLATE, STONE_PLATE, GOLD_PLATE, SAPLING, YELLOW_FLOWER, RED_ROSE, WATER_LILY, DOUBLE_PLANT,
+    BROWN_MUSHROOM, RED_MUSHROOM, CARPET, TORCH, VINE, SNOW, TRIPWIRE_HOOK, TRAP_DOOR, IRON_TRAPDOOR, REDSTONE_WIRE,
+    CROPS, CARROT, POTATO
+  ]
+  
+  # If player exceeds any of the limit above, how much must they wait before they try to
+  # use any of the materials above again? Slows down bypassing with //replace etc.
+  Wait_Threshold: 30 seconds
+  
+# -------------------------------------------------------------------------------------------
+# Set to a unique name if using proxy or remote db. Used to identify your server in the
+# network. Should match the server name set in Velocity/BungeeCord config.
+# -------------------------------------------------------------------------------------------
+Server_Name: ''
+  
+# -------------------------------------------------------------------------------------------
+# Set the timezone for for filters used in /protect logs. Empty sets it to server's default.
+# Available: https://garygregory.wordpress.com/2013/06/18/what-are-the-java-timezone-ids/
+# Example: Europe/Budapest, America/New_York etc.
+# -------------------------------------------------------------------------------------------
+Timezone: ""  
+  
+# -------------------------------------------------------------------------------------------
+# What executes our main plugin command. By default it's /protect and /p
+# -------------------------------------------------------------------------------------------
+Command_Aliases: [protect, p]
+
+# -------------------------------------------------------------------------------------------
+# Automatically remove database logs (items, transactions, commands) older than the date.
+# -------------------------------------------------------------------------------------------
+Remove_Entries_Older_Than: 120 days
+
+# -------------------------------------------------------------------------------------------
+# Enable regions support? Create 3D regions using "/protect region tool" and then
+# use "require/ignore region" operator in rules to restrict them to certain regions.
+# -------------------------------------------------------------------------------------------
+Register_Regions: false
+
+# -------------------------------------------------------------------------------------------
+# Enable tools support? Imposes a slight performance penaulty, used in the region tool
+# which you don't need since you can just use "/protect region primary/secondary"
+# -------------------------------------------------------------------------------------------
+Register_Tools: false
+
+# -------------------------------------------------------------------------------------------
+# The plugin prefix
+# -------------------------------------------------------------------------------------------
+Prefix: "&8[&3Protect&8]&7"
+
+# -------------------------------------------------------------------------------------------
+# Parts of the plugin to print information about to the console.
+#
+# Available: [mysql, scan, operator]
+# -------------------------------------------------------------------------------------------
+Debug: []
+
+# -------------------------------------------------------------------------------------------------
+# Send anonymized error reports to sentry.io? This helps us fix bugs without you needing to
+# report them manually.
+# -------------------------------------------------------------------------------------------------
+Sentry: true
