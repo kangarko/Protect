@@ -268,7 +268,7 @@ public final class Rule extends ProtectOperator {
 						this.check0(item);
 
 					} catch (final CloneItemException | EventHandledException ex) {
-						final boolean itemsModified = ex instanceof CloneItemException || (ex instanceof EventHandledException && ((EventHandledException) ex).isCancelled());
+						final boolean itemsModified = ex instanceof CloneItemException || ex instanceof EventHandledException && ((EventHandledException) ex).isCancelled();
 
 						if (itemsModified) {
 							final boolean isClone = ex instanceof CloneItemException;
@@ -385,7 +385,7 @@ public final class Rule extends ProtectOperator {
 			final boolean hasMeta = item.hasItemMeta();
 
 			if (hasMeta && item.getItemMeta().hasDisplayName() && Settings.Ignore.CUSTOM_DISPLAY_NAME) {
-				Debugger.debug("scan", "Ignoring item " + this.material + (this.hasPlayer ? "' for " + this.getPlayer().getName() : "") + " with custom display name: " + item.getItemMeta().getDisplayName());
+				Debugger.debug("scan", "Ignoring item " + this.material + (this.hasPlayer ? "' for " + this.getPlayer().getName() : "") + " with custom display name: " + item.getItemMeta().getDisplayName() + " due to settings.yml Ignore.Custom_Display_Name set to true");
 
 				return;
 			}
