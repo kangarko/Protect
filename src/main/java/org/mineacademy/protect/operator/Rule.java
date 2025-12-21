@@ -333,8 +333,7 @@ public final class Rule extends ProtectOperator {
 				if (extraContainer != null) {
 					final ItemStack[] extraContents = extraContainer.getContents();
 
-					for (int i = 0; i < extraContents.length; i++)
-						extraContents[i] = this.contents[offset + i];
+                    System.arraycopy(this.contents, offset, extraContents, 0, extraContents.length);
 
 					extraContainer.setContents(extraContents);
 				}
