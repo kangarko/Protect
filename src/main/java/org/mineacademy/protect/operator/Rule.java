@@ -334,7 +334,7 @@ public final class Rule extends ProtectOperator {
 					final ItemStack[] extraContents = extraContainer.getContents();
 
 					for (int i = 0; i < extraContents.length; i++) {
-						if(offset + i >= extraContents.length)
+						if (offset + i >= this.contents.length)  // Check against SOURCE array, not destination
 							break;
 
 						extraContents[i] = this.contents[offset + i];
