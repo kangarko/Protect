@@ -9,8 +9,8 @@
 
 # An example group
 #
-# This group restrict players who are new to the server to have a maximum of 1 stack 
-# diamond/emerald blocks. New players usually don't have high amount of luxury items, so this might
+# This group restricts players who are new to the server to a maximum of 1 stack of
+# diamond/emerald blocks. New players usually don't have a high amount of luxury items, so this might
 # reveal xrayers, duping operations or staff abusing their rights.
 #
 # The playtime is pulled from your main world/playerdata/ folder from the player's .dat file.

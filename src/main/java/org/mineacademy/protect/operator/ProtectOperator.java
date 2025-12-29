@@ -174,7 +174,7 @@ public abstract class ProtectOperator extends Operator {
 			this.disenchant = true;
 
 		} else if ("then nerf".equals(firstTwo)) {
-			Valid.checkBoolean(!this.nerfEnchant, "then neft already used on " + this);
+			Valid.checkBoolean(!this.nerfEnchant, "then nerf already used on " + this);
 
 			this.nerfEnchant = true;
 

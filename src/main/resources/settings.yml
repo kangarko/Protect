@@ -43,7 +43,7 @@ Scan:
   # with" logic, i.e. /warp home will match /warp home, /warp homeland etc.
   Command: []
 
-  # Run a period scan? Type time in human readable format, i.e. "1 hour" to scan
+  # Run a periodic scan? Type time in human readable format, i.e. "1 hour" to scan
   # every hour, "15 minutes", "60 seconds" or none to disable etc. 
   Periodic: none
 
@@ -77,7 +77,7 @@ Ignore:
   Metadata_Item:
   - CoreArena_ExpDrop
   
-  # Ignore any item having a custom display name. Typically, only third party plugins set this. 
+  # Ignore any item having a custom display name. Typically, only third-party plugins set this. 
   # Use "/protect iteminfo meta" to check your item in hand for what it has.
   #
   # NB: While this typically prevents items from your plugins from being taken, hacked clients
@@ -87,7 +87,7 @@ Ignore:
   # TIP: If you set this to true, set Debug to [scan] to see which items get ignored.
   Custom_Display_Name: false
   
-  # Ignore any item having a custom lore. Typically, only third party plugins set this. 
+  # Ignore any item having a custom lore. Typically, only third-party plugins set this. 
   # Use "/protect iteminfo meta" to check your item in hand for what it has.
   #
   # NB: See Custom_Display_Name for a tip and a warning above.
@@ -245,7 +245,7 @@ WorldEdit:
   # Enable? Restart your server to apply changes.
   Enabled: true
   
-  # Limit WorldEdit operations like //set, //sphere to a maximum amount of changed items to prevent lag.  
+  # Limit WorldEdit operations like //set, //sphere to a maximum number of changed blocks to prevent lag.  
   Total_Limit: 
     
     # You can specify different limits for people with different permissions.

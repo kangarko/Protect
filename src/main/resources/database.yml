@@ -1,11 +1,11 @@
 # -----------------------------------------------------------------------------------------------------
 # This file holds database-related information. 
 #
-# **IMPORTANT** The utf8mb4_unicode_520_ci collation (database encoding) is required, because we need
+# **IMPORTANT** The utf8mb4_unicode_520_ci collation (database encoding) is required, because we
 # need to store messages in 4 bytes (mb4) due to unicode/emojis/non-English letter support.
 #
-# Using MySQL 8.0 is recommended. ChatControl wil attempt to recreate tables with the right
-# encoding if you reset them, in case you're having issues-
+# Using MySQL 8.0 is recommended. ChatControl will attempt to recreate tables with the right
+# encoding if you reset them, in case you're having issues.
 #
 # This file does NOT support reloading.
 # -----------------------------------------------------------------------------------------------------

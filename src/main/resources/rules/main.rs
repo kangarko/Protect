@@ -42,7 +42,7 @@ require amount 65
 then confiscate
 
 # -----------------------------------------------------------------------------------------------------
-# Confiscate the following items if found outside of creative gamemode.
+# Confiscate the following items if found outside of creative game mode.
 # -----------------------------------------------------------------------------------------------------
 match "SOIL"|"BEDROCK"|"COMMAND"|"BARRIER"|"STRUCTURE_BLOCK"|"COMMAND_MINECART"|"ENDER_PORTAL"|"ENDER_PORTAL_FRAME"|"PORTAL"
 name survival-only
@@ -51,7 +51,7 @@ then confiscate
 
 # -----------------------------------------------------------------------------------------------------
 # Restrict diamond blocks to max 64 in a player's inventory.
-# We take the excessive blocks. I.e. if player has 128 diamond blocks
+# We take the excessive blocks, i.e., if a player has 128 diamond blocks
 # after this check he will only have 64.
 # -----------------------------------------------------------------------------------------------------
 match "DIAMOND_BLOCK"|"EMERALD_BLOCK"
@@ -61,7 +61,7 @@ ignore gamemode creative
 then confiscate excess
 
 # -----------------------------------------------------------------------------------------------------
-# The three rules below limit items for newcoming players. Typically, new players should not have
+# The three rules below limit items for new players. Typically, new players should not have
 # too many luxury items and this can reveal xrayers, bad staff or dupe exploits.
 # This will check the amount of inventory items (i.e. in a chest + player inventory).
 #
