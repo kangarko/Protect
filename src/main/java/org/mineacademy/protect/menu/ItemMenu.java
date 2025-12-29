@@ -199,7 +199,7 @@ public final class ItemMenu<T extends ProtectRow & HoldsItems> extends Menu {
 					"This menu shows " + this.item.getPlayer() + "'s",
 					"inventory as he had it before the",
 					"scan. You are allowed to drag items",
-					"back to you inventory.",
+					"back to your inventory.",
 					"",
 					"The first 4 rows store the survival,",
 					"inventory. The last row stores",
