@@ -11,7 +11,7 @@ Protect monitors your network activity for uncommon and impossible itemstacks, c
 
 * Private, unleaked duplication exploits ruining your network.
 * Network raids that disrupt your server's monetization and lose you money.
-* Abusive or new staff misusing privilegees.
+* Abusive or new staff misusing privileges.
 * "Crash items" used by hacked clients to lag or kick clients.
 * X-rayers and other unwished ways to obtain high amount of rare materials quickly.
 * Unbalanced or poorly setup server economy.

@@ -26,7 +26,7 @@ final class InspectCommand extends ProtectSubCommand {
 		super("inspect");
 
 		this.setValidArguments(1, 2);
-		this.setDescription("Print items in container you are looking at and remove crash them without opening the container.");
+		this.setDescription("Print items in a container you are looking at and remove crashed items without opening the container.");
 		this.setUsage("<print/remove> [slot]");
 	}
 
