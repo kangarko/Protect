@@ -197,7 +197,7 @@ public final class ItemMenu<T extends ProtectRow & HoldsItems> extends Menu {
 		protected String[] getInfo() {
 			return new String[] {
 					"This menu shows " + this.item.getPlayer() + "'s",
-					"inventory as he had it before the",
+					"inventory as they had it before the",
 					"scan. You are allowed to drag items",
 					"back to your inventory.",
 					"",
