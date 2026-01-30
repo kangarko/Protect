@@ -76,7 +76,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mineacademy.plugin</groupId>
-			<artifactId>ExcellentShop-NextEngine</artifactId>
+			<artifactId>ExcellentShop-NexEngine</artifactId>
 			<version>1</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/library/NexEngine.jar</systemPath>
