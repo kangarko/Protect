@@ -46,6 +46,21 @@ public enum ProtectTable implements Table {
 	},
 
 	/**
+	 * Creative mode action log table
+	 */
+	CREATIVE("creative", CreativeLog.class) {
+
+		@Override
+		public void onTableCreate(TableCreator creator) {
+			super.onTableCreate(creator);
+
+			creator
+					.add("Action", "text")
+					.add("Target", "text");
+		}
+	},
+
+	/**
 	 * Commerce transactions table
 	 */
 	TRANSACTION("transaction", Transaction.class) {
