@@ -39,6 +39,9 @@ public final class Permissions {
 		@Permission("Your shop actions will leave no traces.")
 		public static final String TRANSACTION = "protect.bypass.transaction";
 
+		@Permission("Your creative mode actions will not be logged.")
+		public static final String CREATIVE = "protect.bypass.creative";
+
 		@Permission("Permission to bypass item limit for WorldEdit operations. Since some operations work with thousands of items, we do not allow only certain items to be bypassed because of the performance impact could freeze the server.")
 		public static final String WORLDEDIT = "protect.bypass.worldedit";
 	}
@@ -54,6 +57,9 @@ public final class Permissions {
 
 		@Permission("Permission to receive alerts when an item is matched against rules.")
 		public static final String ITEM = "protect.notify.item";
+
+		@Permission("Permission to receive alerts when a creative mode action is logged.")
+		public static final String CREATIVE = "protect.notify.creative";
 	}
 
 	@Permission("Permission to be placed in a group. Replace group name with the actual group name.")

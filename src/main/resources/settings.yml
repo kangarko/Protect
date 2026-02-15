@@ -237,6 +237,42 @@ Transaction_Log:
   Discord_Format_Sell: "[{server_name}] [{location}] [{plugin_name}] {player} sold {amount}x{item_type} to {shop_owner} at {price_formatted}"  
 
 # -------------------------------------------------------------------------------------------
+# Log actions performed by players in certain gamemodes (creative by default).
+# Useful for monitoring staff abuse in creative mode. Tracks block placing, breaking,
+# and entity spawning (armor stands, minecarts, item frames, etc.).
+#
+# Give admins "protect.bypass.creative" to ignore logging their actions.
+# -------------------------------------------------------------------------------------------
+Creative_Log:
+
+  # Enable this feature?
+  Enabled: false
+
+  # Which gamemodes should be monitored? Available: SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR
+  Gamemodes: [CREATIVE]
+
+  # Which actions should be logged?
+  Actions:
+    Block_Place: true
+    Block_Break: true
+
+    # Entity placement such as armor stands, item frames, minecarts, boats, etc.
+    Entity_Place: true
+
+  # Send a message to people with "protect.notify.creative" permission?
+  Broadcast: true
+
+  # The format for the broadcast message. Variables: {player}, {action}, {target},
+  # {location}, {world}, {gamemode}, {server_name}, {date}
+  Broadcast_Format: "&8[&dcreative&8]&f {player} &7{action} &f{target}"
+
+  # The discord channel to send the creative log to. Set to "none" to disable.
+  Discord_Channel: none
+
+  # The format for the discord message. See above for variables.
+  Discord_Format: "[{server_name}] [creative] {player} {action} {target} at {location}"
+
+# -------------------------------------------------------------------------------------------
 # Integration with WorldEdit. You can prevent staff from using WorldEdit to bypass your rules
 # and control which materials they are allowed to use.
 # -------------------------------------------------------------------------------------------

@@ -180,6 +180,32 @@ public final class Settings extends SimpleSettings {
 		}
 	}
 
+	public static class CreativeLog {
+		public static Boolean ENABLED;
+		public static IsInList<GameMode> GAMEMODES;
+		public static Boolean BLOCK_PLACE;
+		public static Boolean BLOCK_BREAK;
+		public static Boolean ENTITY_PLACE;
+		public static Boolean BROADCAST;
+		public static String BROADCAST_FORMAT;
+		public static String DISCORD_CHANNEL;
+		public static String DISCORD_FORMAT;
+
+		private static void init() {
+			setPathPrefix("Creative_Log");
+
+			ENABLED = getBoolean("Enabled");
+			GAMEMODES = getIsInList("Gamemodes", GameMode.class);
+			BLOCK_PLACE = getBoolean("Actions.Block_Place");
+			BLOCK_BREAK = getBoolean("Actions.Block_Break");
+			ENTITY_PLACE = getBoolean("Actions.Entity_Place");
+			BROADCAST = getBoolean("Broadcast");
+			BROADCAST_FORMAT = getString("Broadcast_Format");
+			DISCORD_CHANNEL = getString("Discord_Channel");
+			DISCORD_FORMAT = getString("Discord_Format");
+		}
+	}
+
 	public static class WorldEdit {
 		public static Boolean ENABLED;
 		public static Map<String, Integer> TOTAL_GROUP_LIMIT;
