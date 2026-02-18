@@ -12,6 +12,9 @@
 
 # -------------------------------------------------------------------------------------------
 # Configure what triggers the inventory scan.
+#
+# [TIP] Confiscated items are stored in the database and can be viewed/restored via
+#       "/protect logs". Use "/protect logs export" to dump to a file for manual review.
 # -------------------------------------------------------------------------------------------
 Scan: 
   
@@ -25,7 +28,10 @@ Scan:
   World_Change: false
   
   # Scan containers (chests, furnaces, enchant tables, etc.) on open? You can configure
-  # exceptions in the section below.
+  # exceptions in the Ignore section below (see Inventory_Types and Inventory_Titles).
+  #
+# [TIP] Use "/protect inspect" to check a container's contents without opening it,
+  #       which also shows items that would match your rules.
   Inventory_Open: true
   
   # Scan right and left clicking holding the following materials? We use the same logic as
