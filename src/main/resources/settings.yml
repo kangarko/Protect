@@ -148,7 +148,7 @@ After_Scan:
 # -------------------------------------------------------------------------------------------
 # Rules settings. We automatically load all .rs files from the rules/ folder.
 #
-# You can setup globla alerts each time any rule matches a given item. For individual alerts,
+# You can setup global alerts each time any rule matches a given item. For individual alerts,
 # use the "then notify" operator for each rule.
 #
 # Give admins "protect.bypass.scan" to ignore scanning their inventories.
@@ -317,7 +317,7 @@ Remove_Entries_Older_Than: 120 days
 Register_Regions: false
 
 # -------------------------------------------------------------------------------------------
-# Enable tools support? Imposes a slight performance penaulty, used in the region tool
+# Enable tools support? Imposes a slight performance penalty, used in the region tool
 # which you don't need since you can just use "/protect region primary/secondary"
 # -------------------------------------------------------------------------------------------
 Register_Tools: false
