@@ -616,7 +616,7 @@ public abstract class Operator implements org.mineacademy.fo.model.Rule {
 	 */
 	protected SerializedMap collectOptions() {
 		return SerializedMap.fromArray(
-				"Require Permission", this.requirePermission,
+				"Require Permission", this.requirePermission != null ? this.requirePermission.getKey() : null,
 				"Require Script", this.requireScript,
 				"Require Gamemodes", this.requireGamemodes,
 				"Require Worlds", this.requireWorlds,
@@ -639,7 +639,7 @@ public abstract class Operator implements org.mineacademy.fo.model.Rule {
 				//"Proxy Commands", this.proxyCommands,
 				"Save Keys", this.saveData,
 				"Console Messages", this.consoleMessages,
-				"Kick Message", this.kickMessage,
+				"Kick Message", this.kickMessage != null ? this.kickMessage.toPlain() : null,
 				"Toast Message", this.toast,
 				"Notify Messages", this.notifyMessages != null ? this.notifyMessages.keySet() : "",
 				"Discord Message", this.discordMessages,
@@ -647,7 +647,7 @@ public abstract class Operator implements org.mineacademy.fo.model.Rule {
 				"Fine", this.fine,
 				"Sounds", this.sounds,
 				"Title", this.title,
-				"Action Bar", this.actionBar,
+				"Action Bar", this.actionBar != null ? this.actionBar.toPlain() : null,
 				"Boss Bar", this.bossBar,
 				"Warn Messages", Common.convertList(this.warnMessages.values(), listOfComponents -> Common.convertList(listOfComponents, element -> element.toLegacySection(null))),
 				"Abort", this.abort,
