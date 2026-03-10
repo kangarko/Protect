@@ -273,7 +273,20 @@ public final class Rule extends ProtectOperator {
 						if (itemsModified) {
 							final boolean isClone = ex instanceof CloneItemException;
 
-							this.contents[slot] = isClone ? this.nbtItem.getItem() : null;
+							if (isClone) {
+								// If confiscate excess already removed or reduced this item, respect that
+								final ItemStack currentSlotItem = this.contents[slot];
+
+								if (currentSlotItem != null) {
+									final ItemStack clonedItem = this.nbtItem.getItem();
+
+									clonedItem.setAmount(currentSlotItem.getAmount());
+									this.contents[slot] = clonedItem;
+								}
+								// else: item was fully removed by confiscate excess, keep it null
+							} else {
+								this.contents[slot] = null;
+							}
 
 							this.setModified(true);
 
@@ -307,8 +320,13 @@ public final class Rule extends ProtectOperator {
 
 				// Set main inventory content. In modern, this includes armor
 				final ItemStack[] survivalContent = this.getPlayer().getInventory().getContents();
+				final int playerSlotCount = InventorySnapshot.TOTAL_PLAYER_SLOTS;
 
 				for (int i = 0; i < survivalContent.length; i++) {
+					// Only write back slots that were part of the original player inventory scan
+					if (i >= playerSlotCount)
+						break;
+
 					survivalContent[i] = i < this.contents.length ? this.contents[i] : null;
 
 					offset++;

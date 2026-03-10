@@ -599,7 +599,7 @@ public abstract class ProtectOperator extends Operator {
 					for (int i = 0; i < this.contents.length; i++) {
 						final ItemStack otherItem = this.contents[i];
 
-						if (otherItem != null && otherItem.getType() == this.item.getType())
+						if (this.matchesItemIdentity(operator, otherItem))
 							found += otherItem.getAmount();
 					}
 
@@ -616,7 +616,7 @@ public abstract class ProtectOperator extends Operator {
 							for (int i = 0; i < this.contents.length && removeCount > 0; i++) {
 								final ItemStack otherItem = this.contents[i];
 
-								if (otherItem != null && otherItem.getType() == this.item.getType()) {
+								if (this.matchesItemIdentity(operator, otherItem)) {
 									final int otherAmount = otherItem.getAmount();
 
 									if (otherAmount > removeCount) {
@@ -651,6 +651,49 @@ public abstract class ProtectOperator extends Operator {
 						return false;
 					}
 				}
+			}
+
+			return true;
+		}
+
+		/*
+		 * Check if the given inventory item matches the operator's require conditions
+		 * that distinguish item identity (name, lore). Used in the inventory amount counting
+		 * and excess removal loops so that only items matching the rule are counted/removed.
+		 */
+		private boolean matchesItemIdentity(T operator, ItemStack otherItem) {
+			if (otherItem == null || otherItem.getType() != this.item.getType())
+				return false;
+
+			final ItemMeta meta = otherItem.hasItemMeta() ? otherItem.getItemMeta() : null;
+
+			if (operator.getRequireName() != null || operator.getRequireNameLength() != null) {
+				if (meta == null || !meta.hasDisplayName())
+					return false;
+
+				final String strippedName = CompChatColor.stripColorCodes(meta.getDisplayName());
+
+				if (operator.getRequireNameLength() != null && strippedName.length() < operator.getRequireNameLength())
+					return false;
+
+				if (operator.getRequireName() != null && !operator.getRequireName().find(strippedName.trim()))
+					return false;
+			}
+
+			if (operator.getRequireLore() != null || operator.getRequireLoreLength() != null) {
+				if (meta == null || !meta.hasLore())
+					return false;
+
+				final List<String> lore = meta.getLore();
+				lore.removeIf(String::isEmpty);
+
+				final String joinedLore = Common.join(lore, "|", line -> CompChatColor.stripColorCodes(line).trim());
+
+				if (operator.getRequireLore() != null && !operator.getRequireLore().equalsIgnoreCase(joinedLore))
+					return false;
+
+				if (operator.getRequireLoreLength() != null && String.join("", lore).length() < operator.getRequireLoreLength())
+					return false;
 			}
 
 			return true;
