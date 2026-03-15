@@ -6,12 +6,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
@@ -186,6 +189,27 @@ public final class ScanListener implements Listener {
 					event.setCancelled(true);
 			}
 		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onGameModeChange(PlayerGameModeChangeEvent event) {
+		Platform.runTask(1, () -> this.scanPlayerIf(ScanCause.GAMEMODE_CHANGE, Settings.Scan.GAMEMODE_CHANGE, event.getPlayer()));
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onCreativeClick(InventoryCreativeEvent event) {
+		if (!Settings.Scan.CREATIVE_CLICK || !(event.getWhoClicked() instanceof Player))
+			return;
+
+		Platform.runTask(1, () -> this.scanPlayerIf(ScanCause.CREATIVE, true, (Player) event.getWhoClicked()));
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onItemPickup(EntityPickupItemEvent event) {
+		if (!(event.getEntity() instanceof Player))
+			return;
+
+		Platform.runTask(1, () -> this.scanPlayerIf(ScanCause.ITEM_PICKUP, Settings.Scan.ITEM_PICKUP, (Player) event.getEntity()));
 	}
 
 	/**

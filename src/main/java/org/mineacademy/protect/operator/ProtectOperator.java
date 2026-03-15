@@ -9,6 +9,8 @@ import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -69,12 +71,18 @@ public abstract class ProtectOperator extends Operator {
 	private boolean checkMaxStackSize;
 	private boolean checkEnchantNotApplicable;
 	private boolean checkEnchantTooHigh;
+	private boolean checkEnchantConflicting;
+	private boolean checkUnbreakable;
+	private boolean checkAttributeModified;
+	private Double requireAttributeValue;
 
 	private boolean disenchant = false;
 	private boolean nerfEnchant = false;
 	private boolean clone = false;
 	private boolean confiscate = false;
 	private boolean confiscateOverLimit = false;
+	private boolean stripAttributes = false;
+	private boolean stripNbt = false;
 
 	@Override
 	public boolean onParse(String firstTwo, String theRestTwo, String[] args) {
@@ -168,6 +176,18 @@ public abstract class ProtectOperator extends Operator {
 		else if ("check enchant too-high".equals(firstThree))
 			this.checkEnchantTooHigh = true;
 
+		else if ("check enchant conflicting".equals(firstThree))
+			this.checkEnchantConflicting = true;
+
+		else if ("check unbreakable".equals(firstTwo))
+			this.checkUnbreakable = true;
+
+		else if ("check attribute modified".equals(firstThree))
+			this.checkAttributeModified = true;
+
+		else if ("require attribute value".equals(firstThree))
+			this.requireAttributeValue = Double.parseDouble(theRestThree);
+
 		else if ("then disenchant".equals(firstTwo)) {
 			Valid.checkBoolean(!this.disenchant, "then disenchant already used on " + this);
 
@@ -177,6 +197,16 @@ public abstract class ProtectOperator extends Operator {
 			Valid.checkBoolean(!this.nerfEnchant, "then nerf already used on " + this);
 
 			this.nerfEnchant = true;
+
+		} else if ("then strip-attributes".equals(firstTwo)) {
+			Valid.checkBoolean(!this.stripAttributes, "then strip-attributes already used on " + this);
+
+			this.stripAttributes = true;
+
+		} else if ("then strip-nbt".equals(firstTwo)) {
+			Valid.checkBoolean(!this.stripNbt, "then strip-nbt already used on " + this);
+
+			this.stripNbt = true;
 
 		} else if ("then clone".equals(firstTwo)) {
 			Valid.checkBoolean(!this.clone, "then clone already used on " + this);
@@ -216,6 +246,7 @@ public abstract class ProtectOperator extends Operator {
 				"Require Enchant Level", this.requireEnchantLevel,
 				"Require Tag Length", this.requireTagLength,
 				"Require Persistent Tag", this.requirePersistentTags,
+				"Require Attribute Value", this.requireAttributeValue,
 				"Ignore Cause", this.ignoreCauses,
 				"Ignore Tags", this.ignoreTags,
 				"Ignore Materials", this.ignoreMaterials,
@@ -226,8 +257,13 @@ public abstract class ProtectOperator extends Operator {
 				"Check Stack Size", this.checkMaxStackSize,
 				"Check Enchant Unnatural", this.checkEnchantNotApplicable,
 				"Check Enchant Too High", this.checkEnchantTooHigh,
+				"Check Enchant Conflicting", this.checkEnchantConflicting,
+				"Check Unbreakable", this.checkUnbreakable,
+				"Check Attribute Modified", this.checkAttributeModified,
 				"Disenchant", this.disenchant,
 				"Nerf Enchant", this.nerfEnchant,
+				"Strip Attributes", this.stripAttributes,
+				"Strip NBT", this.stripNbt,
 				"Clone", this.clone,
 				"Confiscate", this.confiscate,
 				"Confiscate Excess", this.confiscateOverLimit);
@@ -279,7 +315,9 @@ public abstract class ProtectOperator extends Operator {
 					operator.getRequirePotionAmount() != null ||
 					operator.getRequirePotionDuration() != null ||
 					operator.getRequirePotionAmplifier() != null ||
-					operator.getRequireTagLength() != null;
+					operator.getRequireTagLength() != null ||
+					operator.isCheckUnbreakable() ||
+					operator.isCheckAttributeModified();
 		}
 
 		private boolean hasPotionFilters(T operator) {
@@ -287,7 +325,8 @@ public abstract class ProtectOperator extends Operator {
 		}
 
 		private boolean hasEnchantFilters(T operator) {
-			return !operator.getIgnoreEnchants().isEmpty() || operator.getRequireEnchantLevel() != null;
+			return !operator.getIgnoreEnchants().isEmpty() || operator.getRequireEnchantLevel() != null
+					|| operator.isCheckEnchantNotApplicable() || operator.isCheckEnchantTooHigh() || operator.isCheckEnchantConflicting();
 		}
 
 		@Override
@@ -587,6 +626,60 @@ public abstract class ProtectOperator extends Operator {
 				}
 			}
 
+			if (operator.isCheckEnchantConflicting()) {
+				boolean hasConflict = false;
+
+				final List<Enchantment> enchantList = new ArrayList<>(enchants.keySet());
+
+				for (int i = 0; i < enchantList.size(); i++)
+					for (int j = i + 1; j < enchantList.size(); j++)
+						if (enchantList.get(i).conflictsWith(enchantList.get(j))) {
+							hasConflict = true;
+
+							break;
+						}
+
+				if (!hasConflict) {
+					Debugger.debug("operator", "\tIgnoring due to no conflicting enchantments found");
+
+					return false;
+				}
+			}
+
+			if (operator.isCheckUnbreakable()) {
+				if (meta == null || !meta.isUnbreakable()) {
+					Debugger.debug("operator", "\tIgnoring due to item not being unbreakable");
+
+					return false;
+				}
+			}
+
+			if (operator.isCheckAttributeModified()) {
+				if (meta == null || !meta.hasAttributeModifiers()) {
+					Debugger.debug("operator", "\tIgnoring due to item not having attribute modifiers");
+
+					return false;
+				}
+
+				if (operator.getRequireAttributeValue() != null) {
+					boolean foundExcessive = false;
+
+					for (final Map.Entry<Attribute, AttributeModifier> entry : meta.getAttributeModifiers().entries()) {
+						if (Math.abs(entry.getValue().getAmount()) >= operator.getRequireAttributeValue()) {
+							foundExcessive = true;
+
+							break;
+						}
+					}
+
+					if (!foundExcessive) {
+						Debugger.debug("operator", "\tIgnoring due to no attribute modifier value exceeding " + operator.getRequireAttributeValue());
+
+						return false;
+					}
+				}
+			}
+
 			if (this.contents != null) {
 				int found = 0;
 				int maxAllowedPieces = this.ruleForGroup instanceof ProtectOperator && ((ProtectOperator) this.ruleForGroup).getIgnoreInventoryAmount() != null ? ((ProtectOperator) this.ruleForGroup).getIgnoreInventoryAmount() : -1;
@@ -737,6 +830,31 @@ public abstract class ProtectOperator extends Operator {
 				this.verbosePush(operator, "&cRemoved " + this.removedExcess + " excess items.");
 
 				this.removedExcess = 0;
+			}
+
+			if (operator.isStripAttributes()) {
+				final ItemMeta meta = this.item.getItemMeta();
+
+				if (meta != null && meta.hasAttributeModifiers()) {
+					for (final Attribute attribute : new HashSet<>(meta.getAttributeModifiers().keySet()))
+						meta.removeAttributeModifier(attribute);
+
+					this.item.setItemMeta(meta);
+
+					this.addLoggedItem(operator, this.item);
+					this.verbosePush(operator, "&cItem attribute modifiers stripped.");
+					this.setModified(true);
+				}
+			}
+
+			if (operator.isStripNbt()) {
+				final ItemStack clean = new ItemStack(this.item.getType(), this.item.getAmount());
+
+				this.addLoggedItem(operator, this.item);
+
+				this.item.setItemMeta(clean.getItemMeta());
+				this.verbosePush(operator, "&cItem NBT data stripped.");
+				this.setModified(true);
 			}
 
 			if (operator.isDisenchant()) {

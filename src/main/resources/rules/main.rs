@@ -214,3 +214,32 @@ match *
 name enchant-too-high
 check enchant too-high
 then confiscate
+
+# -----------------------------------------------------------------------------------------------------
+# Block conflicting enchantments on the same item (e.g., Sharpness + Smite).
+# Naturally, Minecraft prevents this from happening, so this catches hacked items.
+# -----------------------------------------------------------------------------------------------------
+match *
+name enchant-conflicting
+check enchant conflicting
+then confiscate
+
+# -----------------------------------------------------------------------------------------------------
+# Block items with the unbreakable flag set outside of creative mode.
+# Unbreakable items cannot be obtained in survival without hacking.
+# -----------------------------------------------------------------------------------------------------
+match *
+name unbreakable
+check unbreakable
+ignore gamemode creative
+then strip-nbt
+
+# -----------------------------------------------------------------------------------------------------
+# Block items with custom attribute modifiers (e.g., overpowered damage/speed).
+# Use "require attribute value <amount>" to only match modifiers above a certain threshold.
+# -----------------------------------------------------------------------------------------------------
+match *
+name attribute-modified
+check attribute modified
+require attribute value 100
+then strip-attributes

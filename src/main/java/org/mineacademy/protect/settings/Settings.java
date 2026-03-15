@@ -47,6 +47,9 @@ public final class Settings extends SimpleSettings {
 		public static Boolean ITEM_SPAWN;
 		public static IsInList<String> COMMAND;
 		public static SimpleTime PERIODIC;
+		public static Boolean GAMEMODE_CHANGE;
+		public static Boolean CREATIVE_CLICK;
+		public static Boolean ITEM_PICKUP;
 
 		private static void init() {
 			setPathPrefix("Scan");
@@ -59,6 +62,9 @@ public final class Settings extends SimpleSettings {
 			ITEM_SPAWN = getBoolean("Item_Spawn");
 			COMMAND = getIsInList("Command", String.class);
 			PERIODIC = getTime("Periodic");
+			GAMEMODE_CHANGE = getBoolean("Gamemode_Change");
+			CREATIVE_CLICK = getBoolean("Creative_Click");
+			ITEM_PICKUP = getBoolean("Item_Pickup");
 		}
 	}
 

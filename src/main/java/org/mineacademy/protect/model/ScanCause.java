@@ -14,7 +14,10 @@ public enum ScanCause {
 	COMMAND("command"),
 	INVENTORY_OPEN("inventory open"),
 	ITEM_CLICK("item click"),
-	ITEM_SPAWN("item spawn");
+	ITEM_SPAWN("item spawn"),
+	CREATIVE("creative"),
+	GAMEMODE_CHANGE("gamemode change"),
+	ITEM_PICKUP("item pickup");
 
 	@Getter
 	private final String key;

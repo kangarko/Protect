@@ -8,6 +8,7 @@ import org.mineacademy.fo.filter.FilterWorld;
 import org.mineacademy.fo.model.HookManager;
 import org.mineacademy.fo.platform.BukkitPlugin;
 import org.mineacademy.fo.platform.Platform;
+import org.mineacademy.fo.model.Task;
 import org.mineacademy.fo.region.DiskRegion;
 import org.mineacademy.fo.visual.VisualizedRegion;
 import org.mineacademy.protect.filter.FilterServer;
@@ -32,6 +33,8 @@ import org.mineacademy.protect.task.PeriodScanTask;
  * The main plugin class.
  */
 public final class Protect extends BukkitPlugin {
+
+	private Task periodicScanTask;
 
 	/**
 	 * @see org.mineacademy.fo.platform.BukkitPlugin#getStartupLogo()
@@ -105,7 +108,7 @@ public final class Protect extends BukkitPlugin {
 		}
 
 		if (Settings.Scan.PERIODIC.isEnabled())
-			Platform.runTaskTimer(Settings.Scan.PERIODIC.getTimeTicks(), new PeriodScanTask());
+			this.periodicScanTask = Platform.runTaskTimer(Settings.Scan.PERIODIC.getTimeTicks(), new PeriodScanTask());
 
 		Platform.runTaskAsync(() -> Database.getInstance().purgeOldEntries());
 	}
@@ -114,6 +117,14 @@ public final class Protect extends BukkitPlugin {
 	protected void onPluginReload() {
 		Groups.getInstance().load();
 		Rules.getInstance().load();
+
+		if (this.periodicScanTask != null) {
+			this.periodicScanTask.cancel();
+			this.periodicScanTask = null;
+		}
+
+		if (Settings.Scan.PERIODIC.isEnabled())
+			this.periodicScanTask = Platform.runTaskTimer(Settings.Scan.PERIODIC.getTimeTicks(), new PeriodScanTask());
 	}
 
 	@Override
