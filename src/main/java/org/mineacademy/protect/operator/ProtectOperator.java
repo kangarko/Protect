@@ -69,12 +69,14 @@ public abstract class ProtectOperator extends Operator {
 	private boolean checkMaxStackSize;
 	private boolean checkEnchantNotApplicable;
 	private boolean checkEnchantTooHigh;
+	private boolean checkUnbreakable;
 
 	private boolean disenchant = false;
 	private boolean nerfEnchant = false;
 	private boolean clone = false;
 	private boolean confiscate = false;
 	private boolean confiscateOverLimit = false;
+	private boolean stripNbt = false;
 
 	@Override
 	public boolean onParse(String firstTwo, String theRestTwo, String[] args) {
@@ -168,6 +170,9 @@ public abstract class ProtectOperator extends Operator {
 		else if ("check enchant too-high".equals(firstThree))
 			this.checkEnchantTooHigh = true;
 
+		else if ("check unbreakable".equals(firstTwo))
+			this.checkUnbreakable = true;
+
 		else if ("then disenchant".equals(firstTwo)) {
 			Valid.checkBoolean(!this.disenchant, "then disenchant already used on " + this);
 
@@ -177,6 +182,11 @@ public abstract class ProtectOperator extends Operator {
 			Valid.checkBoolean(!this.nerfEnchant, "then nerf already used on " + this);
 
 			this.nerfEnchant = true;
+
+		} else if ("then strip-nbt".equals(firstTwo)) {
+			Valid.checkBoolean(!this.stripNbt, "then strip-nbt already used on " + this);
+
+			this.stripNbt = true;
 
 		} else if ("then clone".equals(firstTwo)) {
 			Valid.checkBoolean(!this.clone, "then clone already used on " + this);
@@ -226,11 +236,13 @@ public abstract class ProtectOperator extends Operator {
 				"Check Stack Size", this.checkMaxStackSize,
 				"Check Enchant Unnatural", this.checkEnchantNotApplicable,
 				"Check Enchant Too High", this.checkEnchantTooHigh,
+				"Check Unbreakable", this.checkUnbreakable,
 				"Disenchant", this.disenchant,
 				"Nerf Enchant", this.nerfEnchant,
 				"Clone", this.clone,
 				"Confiscate", this.confiscate,
-				"Confiscate Excess", this.confiscateOverLimit);
+				"Confiscate Excess", this.confiscateOverLimit,
+				"Strip NBT", this.stripNbt);
 	}
 
 	public static class ProtectCheck<T extends ProtectOperator> extends OperatorCheck<T> {
@@ -587,6 +599,14 @@ public abstract class ProtectOperator extends Operator {
 				}
 			}
 
+			if (operator.isCheckUnbreakable()) {
+				if (meta == null || !meta.isUnbreakable()) {
+					Debugger.debug("operator", "\tIgnoring due to item not being unbreakable");
+
+					return false;
+				}
+			}
+
 			if (this.contents != null) {
 				int found = 0;
 				int maxAllowedPieces = this.ruleForGroup instanceof ProtectOperator && ((ProtectOperator) this.ruleForGroup).getIgnoreInventoryAmount() != null ? ((ProtectOperator) this.ruleForGroup).getIgnoreInventoryAmount() : -1;
@@ -737,6 +757,17 @@ public abstract class ProtectOperator extends Operator {
 				this.verbosePush(operator, "&cRemoved " + this.removedExcess + " excess items.");
 
 				this.removedExcess = 0;
+			}
+
+			if (operator.isStripNbt()) {
+				this.verbosePush(operator, "&cItem NBT stripped to vanilla.");
+
+				this.addLoggedItem(operator, this.item);
+
+				final ItemStack clean = new ItemStack(this.item.getType(), this.item.getAmount());
+				this.item.setItemMeta(clean.getItemMeta());
+
+				this.setModified(true);
 			}
 
 			if (operator.isDisenchant()) {

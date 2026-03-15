@@ -214,3 +214,14 @@ match *
 name enchant-too-high
 check enchant too-high
 then confiscate
+
+# -----------------------------------------------------------------------------------------------------
+# Block items with the unbreakable flag set via NBT editors. This also strips all other custom
+# NBT modifications (custom sounds, equippable slots, attributes, custom data, etc.) reverting
+# the item to a clean vanilla state.
+# Use "ignore tag <tag>" to exclude items from custom plugins that legitimately use unbreakable.
+# -----------------------------------------------------------------------------------------------------
+match *
+name unbreakable
+check unbreakable
+then strip-nbt
