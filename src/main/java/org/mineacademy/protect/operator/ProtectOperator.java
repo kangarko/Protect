@@ -539,8 +539,8 @@ public abstract class ProtectOperator extends Operator {
 						return false;
 					}
 
-			if (operator.isCheckMaxStackSize() && amount <= this.item.getMaxStackSize()) {
-				Debugger.debug("operator", "\tIgnoring due to stack size " + amount + " being less than max stack size " + this.item.getMaxStackSize());
+			if (operator.isCheckMaxStackSize() && amount <= this.item.getType().getMaxStackSize()) {
+				Debugger.debug("operator", "\tIgnoring due to stack size " + amount + " being less than max stack size " + this.item.getType().getMaxStackSize());
 
 				return false;
 			}
