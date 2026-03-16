@@ -1,11 +1,20 @@
 package org.mineacademy.protect.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
 import org.mineacademy.fo.ValidCore;
 import org.mineacademy.fo.collection.SerializedMap;
+import org.mineacademy.fo.exception.FoException;
 import org.mineacademy.fo.model.ConfigSerializable;
 
 import lombok.AccessLevel;
@@ -25,6 +34,8 @@ import lombok.ToString;
  *
  * You can use | to separate multiple matches i.e. DIAMOND_*|GOLDEN_* etc
  * You can use '*'  to match everything
+ * You can use #tag to match Minecraft item/block tags i.e. #swords, #enchantable/armor, #anvil
+ * You can combine tags with materials i.e. #swords|TRIDENT
  *
  * If you still want/need to use regex you can prefix your message with "* " and then match
  * normally, i.e. "* ^DIAMOND_(SWORD|HOE)"
@@ -54,6 +65,12 @@ public class FastMatcher implements ConfigSerializable {
 	private final Matcher[] matchers;
 
 	/**
+	 * Material names resolved from Minecraft tags (#tag syntax), null if no tags used
+	 */
+	@Nullable
+	private final Set<String> taggedMaterials;
+
+	/**
 	 * Return if this matcher matches the given message,
 	 * case sensitive
 	 *
@@ -61,6 +78,10 @@ public class FastMatcher implements ConfigSerializable {
 	 * @return
 	 */
 	public boolean find(String message) {
+
+		// Check Minecraft tag membership (resolved at compile time for performance)
+		if (this.taggedMaterials != null && this.taggedMaterials.contains(message))
+			return true;
 
 		// Indicates we match everything
 		if (this.matchers == null)
@@ -112,17 +133,58 @@ public class FastMatcher implements ConfigSerializable {
 	 */
 	public static FastMatcher compile(String pattern) {
 		if ("*".equals(pattern))
-			return new FastMatcher(null, pattern, null);
+			return new FastMatcher(null, pattern, null, null);
 
 		else if (pattern.startsWith("* "))
-			return new FastMatcher(Pattern.compile(pattern.substring(2)), pattern, null);
+			return new FastMatcher(Pattern.compile(pattern.substring(2)), pattern, null, null);
 
 		final List<Matcher> matchers = new ArrayList<>();
+		Set<String> taggedMaterials = null;
 
 		for (final String part : pattern.split("\\|"))
-			matchers.add(Matcher.compile(part));
 
-		return new FastMatcher(null, pattern, matchers.toArray(new Matcher[matchers.size()]));
+			if (part.startsWith("#")) {
+				final String tagName = part.substring(1);
+				final Tag<Material> tag = lookupTag(tagName);
+
+				if (tag == null)
+					throw new FoException("Unknown Minecraft tag '#" + tagName + "' in match pattern '" + pattern + "'. "
+							+ "Use vanilla tag names such as 'swords', 'anvil', 'enchantable/armor'. "
+							+ "See https://minecraft.wiki/w/Tag for a list of all tags.", false);
+
+				if (taggedMaterials == null)
+					taggedMaterials = new HashSet<>();
+
+				for (final Material material : tag.getValues())
+					taggedMaterials.add(material.name());
+
+			} else
+				matchers.add(Matcher.compile(part));
+
+		return new FastMatcher(null, pattern, matchers.toArray(new Matcher[matchers.size()]), taggedMaterials);
+	}
+
+	/**
+	 * Look up a Minecraft tag by name, trying items registry first, then blocks.
+	 */
+	@Nullable
+	private static Tag<Material> lookupTag(String tagName) {
+		if (tagName.isEmpty())
+			throw new FoException("Empty Minecraft tag name '#' in match pattern. Specify a tag name such as '#swords' or '#enchantable/armor'.", false);
+
+		try {
+			final NamespacedKey key = NamespacedKey.minecraft(tagName.toLowerCase());
+
+			Tag<Material> tag = Bukkit.getTag("items", key, Material.class);
+
+			if (tag == null)
+				tag = Bukkit.getTag("blocks", key, Material.class);
+
+			return tag;
+
+		} catch (final NoSuchMethodError ex) {
+			throw new FoException("Minecraft tag matching (#tag) requires Minecraft 1.13 or newer.", false);
+		}
 	}
 
 	/**
