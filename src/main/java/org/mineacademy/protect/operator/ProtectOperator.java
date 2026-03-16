@@ -614,7 +614,7 @@ public abstract class ProtectOperator extends Operator {
 
 						if (operator.isNerfEnchant()) {
 							this.item.removeEnchantment(enchant);
-							this.item.addEnchantment(enchant, enchant.getMaxLevel());
+							this.item.addUnsafeEnchantment(enchant, enchant.getMaxLevel());
 						}
 					}
 				}
