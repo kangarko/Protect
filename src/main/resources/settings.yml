@@ -55,11 +55,11 @@ Scan:
 
   # Scan when a player changes their gamemode? Catches items obtained in creative when
   # switching to survival. Covers F3+F4, commands, and plugin-driven changes.
-  Gamemode_Change: true
+  Gamemode_Change: false
 
   # Scan when a creative player clicks items in their inventory? Catches items placed
   # via Saved Hotbars, NBT editors, and creative inventory UI in real time.
-  Creative_Click: true
+  Creative_Click: false
 
   # Scan when a player picks up an item? Disabled by default since it can be high-frequency.
   Item_Pickup: false
