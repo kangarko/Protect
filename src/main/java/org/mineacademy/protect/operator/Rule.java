@@ -477,7 +477,7 @@ public final class Rule extends ProtectOperator {
 					this.clearVerboseMessages();
 
 					if (this.matcher.find(this.materialName)) {
-						Debugger.debug("scan", "\tMatched rule " + rule.getUniqueName());
+						Debugger.debug("scan", "\tChecking rule " + rule.getUniqueName());
 
 						if (!this.canFilter(rule))
 							continue;
