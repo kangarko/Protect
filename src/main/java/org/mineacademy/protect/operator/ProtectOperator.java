@@ -67,6 +67,9 @@ public abstract class ProtectOperator extends Operator {
 	private Integer ignoreInventoryAmount;
 	private Integer ignoreEnchantLevel;
 	private final List<Enchantment> ignoreEnchants = new ArrayList<>();
+	private FastMatcher ignoreLore;
+	private FastMatcher ignoreDisplayName;
+	private Integer ignoreModelData;
 
 	private boolean checkMaxStackSize;
 	private boolean checkEnchantNotApplicable;
@@ -167,6 +170,15 @@ public abstract class ProtectOperator extends Operator {
 			for (final String enchantName : theRestTwoSplit)
 				this.ignoreEnchants.add(CompEnchantment.getByName(enchantName));
 
+		else if ("ignore lore".equals(firstTwo))
+			this.ignoreLore = FastMatcher.compile(theRestTwo);
+
+		else if ("ignore displayname".equals(firstTwo))
+			this.ignoreDisplayName = FastMatcher.compile(theRestTwo);
+
+		else if ("ignore modeldata".equals(firstTwo))
+			this.ignoreModelData = Integer.parseInt(theRestTwo);
+
 		else if ("check stack size".equals(firstThree))
 			this.checkMaxStackSize = true;
 
@@ -254,6 +266,9 @@ public abstract class ProtectOperator extends Operator {
 				"Ignore Inventory Amount", this.ignoreInventoryAmount,
 				"Ignore Enchant Level", this.ignoreEnchantLevel,
 				"Ignore Enchants", this.ignoreEnchants,
+				"Ignore Lore", this.ignoreLore,
+				"Ignore Display Name", this.ignoreDisplayName,
+				"Ignore Model Data", this.ignoreModelData,
 				"Check Stack Size", this.checkMaxStackSize,
 				"Check Enchant Unnatural", this.checkEnchantNotApplicable,
 				"Check Enchant Too High", this.checkEnchantTooHigh,
@@ -528,6 +543,35 @@ public abstract class ProtectOperator extends Operator {
 
 						return false;
 					}
+				}
+
+				if (operator.getIgnoreDisplayName() != null && meta.hasDisplayName()) {
+					final String strippedName = CompChatColor.stripColorCodes(meta.getDisplayName()).trim();
+
+					if (operator.getIgnoreDisplayName().find(strippedName)) {
+						Debugger.debug("operator", "\tIgnoring due to display name '" + strippedName + "' matching ignored pattern: " + operator.getIgnoreDisplayName());
+
+						return false;
+					}
+				}
+
+				if (operator.getIgnoreLore() != null && meta.hasLore()) {
+					final List<String> lore = meta.getLore();
+					lore.removeIf(String::isEmpty);
+
+					final String joinedLore = Common.join(lore, "|", line -> CompChatColor.stripColorCodes(line).trim());
+
+					if (operator.getIgnoreLore().find(joinedLore)) {
+						Debugger.debug("operator", "\tIgnoring due to lore matching ignored pattern: " + operator.getIgnoreLore());
+
+						return false;
+					}
+				}
+
+				if (operator.getIgnoreModelData() != null && meta.hasCustomModelData() && meta.getCustomModelData() == operator.getIgnoreModelData()) {
+					Debugger.debug("operator", "\tIgnoring due to custom model data " + meta.getCustomModelData() + " matching ignored value");
+
+					return false;
 				}
 			}
 
