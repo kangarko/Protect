@@ -158,8 +158,11 @@ final class ItemInfoCommand extends ProtectSubCommand {
 				tellNoPrefix("toString() is too long (" + string.length() + " characters), printing to console instead.");
 
 				Common.log(string);
-			} else
+
+			} else if (this.isPlayer())
 				tell(SimpleComponent.fromMiniAmpersand("&7toString(): &f" + string).onHoverLegacy("&7Click to copy").onClickSuggestCmd(string));
+			else
+				tellNoPrefix("&7toString(): &f" + string);
 
 		} else if (param == Param.NBT) {
 			tellNoPrefix("&6Item information:");
@@ -170,8 +173,11 @@ final class ItemInfoCommand extends ProtectSubCommand {
 				tellNoPrefix("Item NBT tag is too long (" + nbt.length() + " characters), printing to console instead.");
 
 				Common.log(nbt);
-			} else
+
+			} else if (this.isPlayer())
 				tell(SimpleComponent.fromMiniAmpersand("&7NBT: &f" + nbt).onHoverLegacy("&7Click to copy").onClickSuggestCmd(nbt));
+			else
+				tellNoPrefix("&7NBT: &f" + nbt);
 		}
 	}
 
