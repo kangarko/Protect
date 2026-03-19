@@ -220,8 +220,10 @@ then confiscate
 # Naturally, Minecraft prevents this from happening, so this catches hacked items.
 # WARNING: Many custom item plugins intentionally add conflicting enchantments.
 # Uncomment the lines below to enable this rule.
+# TIP: Use #enchantable/durability instead of * to only scan enchantable items (faster).
+# See https://minecraft.wiki/w/Tag for all available tags.
 # -----------------------------------------------------------------------------------------------------
-#match *
+#match #enchantable/durability
 #name enchant-conflicting
 #check enchant conflicting
 #then confiscate
