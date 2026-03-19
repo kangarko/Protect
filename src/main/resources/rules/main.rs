@@ -253,6 +253,16 @@ then confiscate
 #then strip-attributes
 
 # -----------------------------------------------------------------------------------------------------
+# Block items with a non-vanilla death protection component (e.g., enchanted golden apple
+# that gives custom effects on death). Requires 1.21+.
+# Uncomment the lines below to enable this rule.
+# -----------------------------------------------------------------------------------------------------
+#match *
+#name illegal-death-protection
+#check illegal death-protection
+#then strip-death-protection
+
+# -----------------------------------------------------------------------------------------------------
 # Per-rule ignore operators for items with custom display names, lore, or model data.
 # Use these to whitelist specific items from being scanned by a rule instead of relying
 # on the global Ignore settings in settings.yml.

@@ -32,6 +32,7 @@ import org.mineacademy.fo.model.CompChatColor;
 import org.mineacademy.fo.model.SimpleComponent;
 import org.mineacademy.fo.remain.CompEnchantment;
 import org.mineacademy.fo.remain.CompMaterial;
+import org.mineacademy.fo.remain.nbt.NBT;
 import org.mineacademy.protect.model.FastMatcher;
 import org.mineacademy.protect.model.FastMathMatcher;
 import org.mineacademy.protect.model.ScanCause;
@@ -77,6 +78,7 @@ public abstract class ProtectOperator extends Operator {
 	private boolean checkEnchantConflicting;
 	private boolean checkUnbreakable;
 	private boolean checkAttributeModified;
+	private boolean checkIllegalDeathProtection;
 	private Double requireAttributeValue;
 
 	private boolean disenchant = false;
@@ -86,6 +88,7 @@ public abstract class ProtectOperator extends Operator {
 	private boolean confiscateOverLimit = false;
 	private boolean stripAttributes = false;
 	private boolean stripNbt = false;
+	private boolean stripDeathProtection = false;
 
 	@Override
 	public boolean onParse(String firstTwo, String theRestTwo, String[] args) {
@@ -197,6 +200,9 @@ public abstract class ProtectOperator extends Operator {
 		else if ("check attribute modified".equals(firstThree))
 			this.checkAttributeModified = true;
 
+		else if ("check illegal death-protection".equals(firstThree))
+			this.checkIllegalDeathProtection = true;
+
 		else if ("require attribute value".equals(firstThree))
 			this.requireAttributeValue = Double.parseDouble(theRestThree);
 
@@ -219,6 +225,11 @@ public abstract class ProtectOperator extends Operator {
 			Valid.checkBoolean(!this.stripNbt, "then strip-nbt already used on " + this);
 
 			this.stripNbt = true;
+
+		} else if ("then strip-death-protection".equals(firstTwo)) {
+			Valid.checkBoolean(!this.stripDeathProtection, "then strip-death-protection already used on " + this);
+
+			this.stripDeathProtection = true;
 
 		} else if ("then clone".equals(firstTwo)) {
 			Valid.checkBoolean(!this.clone, "then clone already used on " + this);
@@ -275,10 +286,12 @@ public abstract class ProtectOperator extends Operator {
 				"Check Enchant Conflicting", this.checkEnchantConflicting,
 				"Check Unbreakable", this.checkUnbreakable,
 				"Check Attribute Modified", this.checkAttributeModified,
+				"Check Illegal Death Protection", this.checkIllegalDeathProtection,
 				"Disenchant", this.disenchant,
 				"Nerf Enchant", this.nerfEnchant,
 				"Strip Attributes", this.stripAttributes,
 				"Strip NBT", this.stripNbt,
+				"Strip Death Protection", this.stripDeathProtection,
 				"Clone", this.clone,
 				"Confiscate", this.confiscate,
 				"Confiscate Excess", this.confiscateOverLimit);
@@ -724,6 +737,22 @@ public abstract class ProtectOperator extends Operator {
 				}
 			}
 
+			if (operator.isCheckIllegalDeathProtection()) {
+				if (!MinecraftVersion.atLeast(V.v1_21)) {
+					Debugger.debug("operator", "\tIgnoring death-protection check on pre-1.21 server");
+
+					return false;
+				}
+
+				final boolean hasCustomDeathProtection = NBT.getComponents(this.item, comp -> comp.hasTag("minecraft:death_protection"));
+
+				if (!hasCustomDeathProtection) {
+					Debugger.debug("operator", "\tIgnoring due to item not having custom death_protection component");
+
+					return false;
+				}
+			}
+
 			if (this.contents != null) {
 				int found = 0;
 				int maxAllowedPieces = this.ruleForGroup instanceof ProtectOperator && ((ProtectOperator) this.ruleForGroup).getIgnoreInventoryAmount() != null ? ((ProtectOperator) this.ruleForGroup).getIgnoreInventoryAmount() : -1;
@@ -909,6 +938,21 @@ public abstract class ProtectOperator extends Operator {
 
 					this.addLoggedItem(operator, this.item);
 					this.verbosePush(operator, "&cItem attribute modifiers stripped.");
+					this.setModified(true);
+				}
+			}
+
+			if (operator.isStripDeathProtection() && MinecraftVersion.atLeast(V.v1_21)) {
+				final boolean hasDeathProtection = NBT.getComponents(this.item, comp -> comp.hasTag("minecraft:death_protection"));
+
+				if (hasDeathProtection) {
+					this.addLoggedItem(operator, this.item);
+
+					NBT.modifyComponents(this.item, comp -> {
+						comp.removeKey("minecraft:death_protection");
+					});
+
+					this.verbosePush(operator, "&cItem death_protection component stripped.");
 					this.setModified(true);
 				}
 			}
