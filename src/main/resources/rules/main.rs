@@ -251,3 +251,17 @@ then confiscate
 #check attribute modified
 #require attribute value 100
 #then strip-attributes
+
+# -----------------------------------------------------------------------------------------------------
+# Per-rule ignore operators for items with custom display names, lore, or model data.
+# Use these to whitelist specific items from being scanned by a rule instead of relying
+# on the global Ignore settings in settings.yml.
+#
+# Supports wildcard matching (* for any characters): "ignore lore *Quest*"
+# Lore lines are joined with | and colors are stripped before matching.
+#
+# Example: Skip items from a custom plugin by their display name or lore
+# ignore displayname *Custom Weapon*
+# ignore lore *Quest Item*
+# ignore modeldata 12345
+# -----------------------------------------------------------------------------------------------------
