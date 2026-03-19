@@ -743,6 +743,28 @@ public abstract class ProtectOperator extends Operator {
 
 						return false;
 					}
+				} else if (operator.isCheckMaxStackSize() && operator.isConfiscateOverLimit()) {
+					final int vanillaMax = this.item.getType().getMaxStackSize();
+
+					if (amount > vanillaMax) {
+						final int excess = amount - vanillaMax;
+
+						for (int i = 0; i < this.contents.length; i++) {
+							if (this.contents[i] == this.item) {
+								final ItemStack excessItem = this.item.clone();
+								excessItem.setAmount(excess);
+
+								this.addLoggedItem(operator, excessItem);
+
+								this.item.setAmount(vanillaMax);
+								this.contents[i] = this.item;
+								this.setModified(true);
+								this.removedExcess = excess;
+
+								break;
+							}
+						}
+					}
 				}
 			}
 
