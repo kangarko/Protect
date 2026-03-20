@@ -267,10 +267,14 @@ then confiscate
 # resistance, and any other component that doesn't belong on the item's vanilla version.
 # Requires 1.21+. Uncomment the lines below to enable this rule.
 # WARNING: Custom item plugins may add components intentionally. Use ignore operators to whitelist.
+# Use "ignore component <name>" to preserve specific components (e.g. custom_name, lore).
+# Multiple components can be separated with |, e.g. "ignore component custom_name|lore"
+# See https://minecraft.wiki/w/Data_component_format for all component names.
 # -----------------------------------------------------------------------------------------------------
 #match *
 #name illegal-components
 #check illegal components
+#ignore component custom_name|lore|enchantments|custom_data|custom_model_data|damage|repair_cost|attribute_modifiers|stored_enchantments
 #then strip-components
 
 # -----------------------------------------------------------------------------------------------------
@@ -317,6 +321,28 @@ then confiscate
 #name enchantment-glint-override
 #check enchantment-glint-override
 #then strip-enchantment-glint
+
+# -----------------------------------------------------------------------------------------------------
+# Dynamic component rules: You can check and strip ANY component by name without
+# needing a specific built-in rule. Use "check illegal <component>" and "then strip-<component>"
+# where <component> is any Minecraft component name (use underscores, e.g. attack_range).
+# See https://minecraft.wiki/w/Data_component_format for all component names.
+# This works with current and future Minecraft versions automatically.
+# -----------------------------------------------------------------------------------------------------
+#match *
+#name illegal-attack-range
+#check illegal attack_range
+#then strip-attack_range
+
+#match *
+#name illegal-blocks-attacks
+#check illegal blocks_attacks
+#then strip-blocks_attacks
+
+#match *
+#name illegal-glider
+#check illegal glider
+#then strip-glider
 
 # -----------------------------------------------------------------------------------------------------
 # Per-rule ignore operators for items with custom display names, lore, or model data.
