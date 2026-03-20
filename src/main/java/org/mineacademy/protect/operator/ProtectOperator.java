@@ -69,6 +69,15 @@ public abstract class ProtectOperator extends Operator {
 		});
 	}
 
+	private static String resolveComponentKey(String name) {
+		final String mapped = COMPONENT_KEY_MAP.get(name);
+
+		if (mapped != null)
+			return mapped;
+
+		return "minecraft:" + name.replace("-", "_");
+	}
+
 	private Integer requireAmount;
 
 	private final Set<ScanCause> requireCauses = new HashSet<>();
@@ -112,6 +121,7 @@ public abstract class ProtectOperator extends Operator {
 	private boolean stripNbt = false;
 	private final Set<String> illegalComponentChecks = new HashSet<>();
 	private final Set<String> componentStrips = new HashSet<>();
+	private final Set<String> ignoreComponentKeys = new HashSet<>();
 
 	@Override
 	public boolean onParse(String firstTwo, String theRestTwo, String[] args) {
@@ -205,6 +215,10 @@ public abstract class ProtectOperator extends Operator {
 		else if ("ignore modeldata".equals(firstTwo))
 			this.ignoreModelData = Integer.parseInt(theRestTwo);
 
+		else if ("ignore component".equals(firstTwo))
+			for (final String componentName : theRestTwoSplit)
+				this.ignoreComponentKeys.add(resolveComponentKey(componentName));
+
 		else if ("check stack size".equals(firstThree))
 			this.checkMaxStackSize = true;
 
@@ -252,6 +266,9 @@ public abstract class ProtectOperator extends Operator {
 
 		else if ("check illegal components".equals(firstThree))
 			this.illegalComponentChecks.add("components");
+
+		else if ("check illegal".equals(firstTwo))
+			this.illegalComponentChecks.add(theRestTwo);
 
 		else if ("require attribute value".equals(firstThree))
 			this.requireAttributeValue = Double.parseDouble(theRestThree);
@@ -305,6 +322,9 @@ public abstract class ProtectOperator extends Operator {
 
 		} else if ("then strip-components".equals(firstTwo)) {
 			this.componentStrips.add("components");
+
+		} else if (firstTwo.startsWith("then strip-")) {
+			this.componentStrips.add(firstTwo.substring("then strip-".length()));
 
 		} else if ("then clone".equals(firstTwo)) {
 			Valid.checkBoolean(!this.clone, "then clone already used on " + this);
@@ -367,6 +387,7 @@ public abstract class ProtectOperator extends Operator {
 				"Strip NBT", this.stripNbt,
 				"Illegal Component Checks", this.illegalComponentChecks,
 				"Component Strips", this.componentStrips,
+				"Ignore Component Keys", this.ignoreComponentKeys,
 				"Clone", this.clone,
 				"Confiscate", this.confiscate,
 				"Confiscate Excess", this.confiscateOverLimit);
@@ -829,7 +850,7 @@ public abstract class ProtectOperator extends Operator {
 						checkPassed = false;
 
 						for (final String key : itemKeys)
-							if (!vanillaKeys.contains(key)) {
+							if (!vanillaKeys.contains(key) && !operator.getIgnoreComponentKeys().contains(key)) {
 								checkPassed = true;
 
 								break;
@@ -837,9 +858,9 @@ public abstract class ProtectOperator extends Operator {
 					} else if ("hide-tooltip".equals(check))
 						checkPassed = itemKeys.contains("minecraft:tooltip_display") || itemKeys.contains("minecraft:hide_tooltip");
 					else {
-						final String componentKey = COMPONENT_KEY_MAP.get(check);
+						final String componentKey = resolveComponentKey(check);
 
-						checkPassed = componentKey != null && itemKeys.contains(componentKey) && !vanillaKeys.contains(componentKey);
+						checkPassed = itemKeys.contains(componentKey) && !vanillaKeys.contains(componentKey);
 					}
 
 					if (!checkPassed) {
@@ -1058,7 +1079,7 @@ public abstract class ProtectOperator extends Operator {
 					for (final String strip : operator.getComponentStrips()) {
 						if ("components".equals(strip)) {
 							for (final String key : new HashSet<>(comp.getKeys()))
-								if (!vanillaKeys.contains(key)) {
+								if (!vanillaKeys.contains(key) && !operator.getIgnoreComponentKeys().contains(key)) {
 									comp.removeKey(key);
 									modified = true;
 								}
@@ -1075,9 +1096,9 @@ public abstract class ProtectOperator extends Operator {
 							}
 
 						} else {
-							final String componentKey = COMPONENT_KEY_MAP.get(strip);
+							final String componentKey = resolveComponentKey(strip);
 
-							if (componentKey != null && comp.hasTag(componentKey)) {
+							if (comp.hasTag(componentKey)) {
 								comp.removeKey(componentKey);
 								modified = true;
 							}
