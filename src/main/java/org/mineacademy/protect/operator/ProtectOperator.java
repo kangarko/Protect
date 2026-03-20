@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -32,6 +33,7 @@ import org.mineacademy.fo.model.CompChatColor;
 import org.mineacademy.fo.model.SimpleComponent;
 import org.mineacademy.fo.remain.CompEnchantment;
 import org.mineacademy.fo.remain.CompMaterial;
+import org.mineacademy.fo.remain.nbt.NBT;
 import org.mineacademy.protect.model.FastMatcher;
 import org.mineacademy.protect.model.FastMathMatcher;
 import org.mineacademy.protect.model.ScanCause;
@@ -44,6 +46,28 @@ import lombok.Getter;
 
 @Getter
 public abstract class ProtectOperator extends Operator {
+
+	private static final Map<String, String> COMPONENT_KEY_MAP = new HashMap<>();
+	private static final Map<Material, Set<String>> VANILLA_COMPONENT_CACHE = new HashMap<>();
+
+	static {
+		COMPONENT_KEY_MAP.put("food", "minecraft:food");
+		COMPONENT_KEY_MAP.put("consumable", "minecraft:consumable");
+		COMPONENT_KEY_MAP.put("equippable", "minecraft:equippable");
+		COMPONENT_KEY_MAP.put("rarity", "minecraft:rarity");
+		COMPONENT_KEY_MAP.put("damage-resistant", "minecraft:damage_resistant");
+		COMPONENT_KEY_MAP.put("tool", "minecraft:tool");
+		COMPONENT_KEY_MAP.put("death-protection", "minecraft:death_protection");
+		COMPONENT_KEY_MAP.put("enchantment-glint-override", "minecraft:enchantment_glint_override");
+	}
+
+	private static Set<String> getVanillaComponentKeys(Material material) {
+		return VANILLA_COMPONENT_CACHE.computeIfAbsent(material, mat -> {
+			final ItemStack vanilla = new ItemStack(mat);
+
+			return NBT.<Set<String>>getComponents(vanilla, (java.util.function.Function<org.mineacademy.fo.remain.nbt.ReadableNBT, Set<String>>) comp -> new HashSet<>(comp.getKeys()));
+		});
+	}
 
 	private Integer requireAmount;
 
@@ -86,6 +110,8 @@ public abstract class ProtectOperator extends Operator {
 	private boolean confiscateOverLimit = false;
 	private boolean stripAttributes = false;
 	private boolean stripNbt = false;
+	private final Set<String> illegalComponentChecks = new HashSet<>();
+	private final Set<String> componentStrips = new HashSet<>();
 
 	@Override
 	public boolean onParse(String firstTwo, String theRestTwo, String[] args) {
@@ -197,6 +223,36 @@ public abstract class ProtectOperator extends Operator {
 		else if ("check attribute modified".equals(firstThree))
 			this.checkAttributeModified = true;
 
+		else if ("check hide-tooltip".equals(firstTwo))
+			this.illegalComponentChecks.add("hide-tooltip");
+
+		else if ("check enchantment-glint-override".equals(firstTwo))
+			this.illegalComponentChecks.add("enchantment-glint-override");
+
+		else if ("check illegal food".equals(firstThree))
+			this.illegalComponentChecks.add("food");
+
+		else if ("check illegal consumable".equals(firstThree))
+			this.illegalComponentChecks.add("consumable");
+
+		else if ("check illegal equippable".equals(firstThree))
+			this.illegalComponentChecks.add("equippable");
+
+		else if ("check illegal rarity".equals(firstThree))
+			this.illegalComponentChecks.add("rarity");
+
+		else if ("check illegal damage-resistant".equals(firstThree))
+			this.illegalComponentChecks.add("damage-resistant");
+
+		else if ("check illegal tool".equals(firstThree))
+			this.illegalComponentChecks.add("tool");
+
+		else if ("check illegal death-protection".equals(firstThree))
+			this.illegalComponentChecks.add("death-protection");
+
+		else if ("check illegal components".equals(firstThree))
+			this.illegalComponentChecks.add("components");
+
 		else if ("require attribute value".equals(firstThree))
 			this.requireAttributeValue = Double.parseDouble(theRestThree);
 
@@ -219,6 +275,36 @@ public abstract class ProtectOperator extends Operator {
 			Valid.checkBoolean(!this.stripNbt, "then strip-nbt already used on " + this);
 
 			this.stripNbt = true;
+
+		} else if ("then strip-hide-tooltip".equals(firstTwo)) {
+			this.componentStrips.add("hide-tooltip");
+
+		} else if ("then strip-food".equals(firstTwo)) {
+			this.componentStrips.add("food");
+
+		} else if ("then strip-consumable".equals(firstTwo)) {
+			this.componentStrips.add("consumable");
+
+		} else if ("then strip-equippable".equals(firstTwo)) {
+			this.componentStrips.add("equippable");
+
+		} else if ("then strip-rarity".equals(firstTwo)) {
+			this.componentStrips.add("rarity");
+
+		} else if ("then strip-enchantment-glint".equals(firstTwo)) {
+			this.componentStrips.add("enchantment-glint-override");
+
+		} else if ("then strip-damage-resistant".equals(firstTwo)) {
+			this.componentStrips.add("damage-resistant");
+
+		} else if ("then strip-tool".equals(firstTwo)) {
+			this.componentStrips.add("tool");
+
+		} else if ("then strip-death-protection".equals(firstTwo)) {
+			this.componentStrips.add("death-protection");
+
+		} else if ("then strip-components".equals(firstTwo)) {
+			this.componentStrips.add("components");
 
 		} else if ("then clone".equals(firstTwo)) {
 			Valid.checkBoolean(!this.clone, "then clone already used on " + this);
@@ -279,6 +365,8 @@ public abstract class ProtectOperator extends Operator {
 				"Nerf Enchant", this.nerfEnchant,
 				"Strip Attributes", this.stripAttributes,
 				"Strip NBT", this.stripNbt,
+				"Illegal Component Checks", this.illegalComponentChecks,
+				"Component Strips", this.componentStrips,
 				"Clone", this.clone,
 				"Confiscate", this.confiscate,
 				"Confiscate Excess", this.confiscateOverLimit);
@@ -724,6 +812,44 @@ public abstract class ProtectOperator extends Operator {
 				}
 			}
 
+			if (!operator.getIllegalComponentChecks().isEmpty()) {
+				if (!MinecraftVersion.atLeast(V.v1_21)) {
+					Debugger.debug("operator", "\tIgnoring component checks on pre-1.21 server");
+
+					return false;
+				}
+
+				final Set<String> itemKeys = NBT.<Set<String>>getComponents(this.item, (java.util.function.Function<org.mineacademy.fo.remain.nbt.ReadableNBT, Set<String>>) comp -> new HashSet<>(comp.getKeys()));
+				final Set<String> vanillaKeys = getVanillaComponentKeys(this.item.getType());
+
+				for (final String check : operator.getIllegalComponentChecks()) {
+					boolean checkPassed;
+
+					if ("components".equals(check)) {
+						checkPassed = false;
+
+						for (final String key : itemKeys)
+							if (!vanillaKeys.contains(key)) {
+								checkPassed = true;
+
+								break;
+							}
+					} else if ("hide-tooltip".equals(check))
+						checkPassed = itemKeys.contains("minecraft:tooltip_display") || itemKeys.contains("minecraft:hide_tooltip");
+					else {
+						final String componentKey = COMPONENT_KEY_MAP.get(check);
+
+						checkPassed = componentKey != null && itemKeys.contains(componentKey) && !vanillaKeys.contains(componentKey);
+					}
+
+					if (!checkPassed) {
+						Debugger.debug("operator", "\tIgnoring due to item not having illegal " + check + " component");
+
+						return false;
+					}
+				}
+			}
+
 			if (this.contents != null) {
 				int found = 0;
 				int maxAllowedPieces = this.ruleForGroup instanceof ProtectOperator && ((ProtectOperator) this.ruleForGroup).getIgnoreInventoryAmount() != null ? ((ProtectOperator) this.ruleForGroup).getIgnoreInventoryAmount() : -1;
@@ -921,6 +1047,51 @@ public abstract class ProtectOperator extends Operator {
 				this.item.setItemMeta(clean.getItemMeta());
 				this.verbosePush(operator, "&cItem NBT data stripped.");
 				this.setModified(true);
+			}
+
+			if (!operator.getComponentStrips().isEmpty() && MinecraftVersion.atLeast(V.v1_21)) {
+				final Set<String> vanillaKeys = getVanillaComponentKeys(this.item.getType());
+
+				final boolean stripped = NBT.modifyComponents(this.item, comp -> {
+					boolean modified = false;
+
+					for (final String strip : operator.getComponentStrips()) {
+						if ("components".equals(strip)) {
+							for (final String key : new HashSet<>(comp.getKeys()))
+								if (!vanillaKeys.contains(key)) {
+									comp.removeKey(key);
+									modified = true;
+								}
+
+						} else if ("hide-tooltip".equals(strip)) {
+							if (comp.hasTag("minecraft:tooltip_display")) {
+								comp.removeKey("minecraft:tooltip_display");
+								modified = true;
+							}
+
+							if (comp.hasTag("minecraft:hide_tooltip")) {
+								comp.removeKey("minecraft:hide_tooltip");
+								modified = true;
+							}
+
+						} else {
+							final String componentKey = COMPONENT_KEY_MAP.get(strip);
+
+							if (componentKey != null && comp.hasTag(componentKey)) {
+								comp.removeKey(componentKey);
+								modified = true;
+							}
+						}
+					}
+
+					return modified;
+				});
+
+				if (stripped) {
+					this.addLoggedItem(operator, this.item);
+					this.verbosePush(operator, "&cIllegal component(s) stripped.");
+					this.setModified(true);
+				}
 			}
 
 			if (operator.isDisenchant()) {

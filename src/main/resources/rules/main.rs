@@ -253,6 +253,72 @@ then confiscate
 #then strip-attributes
 
 # -----------------------------------------------------------------------------------------------------
+# Block items with hidden tooltips. Hacked clients hide item details to disguise illegal items.
+# Requires 1.21+. Uncomment the lines below to enable this rule.
+# -----------------------------------------------------------------------------------------------------
+#match *
+#name hidden-tooltip
+#check hide-tooltip
+#then strip-hide-tooltip
+
+# -----------------------------------------------------------------------------------------------------
+# Catch-all: Strip ALL non-vanilla components from items at once.
+# This catches hacked food, consumable, equippable, rarity, death protection, tool, damage
+# resistance, and any other component that doesn't belong on the item's vanilla version.
+# Requires 1.21+. Uncomment the lines below to enable this rule.
+# WARNING: Custom item plugins may add components intentionally. Use ignore operators to whitelist.
+# -----------------------------------------------------------------------------------------------------
+#match *
+#name illegal-components
+#check illegal components
+#then strip-components
+
+# -----------------------------------------------------------------------------------------------------
+# Individual component rules (alternative to the catch-all above for granular control).
+# Each rule targets a specific hacked component. Requires 1.21+.
+# Uncomment the ones you need.
+# -----------------------------------------------------------------------------------------------------
+#match *
+#name illegal-food
+#check illegal food
+#then strip-food
+
+#match *
+#name illegal-consumable
+#check illegal consumable
+#then strip-consumable
+
+#match *
+#name illegal-equippable
+#check illegal equippable
+#then strip-equippable
+
+#match *
+#name illegal-rarity
+#check illegal rarity
+#then strip-rarity
+
+#match *
+#name illegal-death-protection
+#check illegal death-protection
+#then strip-death-protection
+
+#match *
+#name illegal-damage-resistant
+#check illegal damage-resistant
+#then strip-damage-resistant
+
+#match *
+#name illegal-tool
+#check illegal tool
+#then strip-tool
+
+#match *
+#name enchantment-glint-override
+#check enchantment-glint-override
+#then strip-enchantment-glint
+
+# -----------------------------------------------------------------------------------------------------
 # Per-rule ignore operators for items with custom display names, lore, or model data.
 # Use these to whitelist specific items from being scanned by a rule instead of relying
 # on the global Ignore settings in settings.yml.
