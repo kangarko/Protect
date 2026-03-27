@@ -137,14 +137,14 @@ public final class Protect extends BukkitPlugin {
 		return 2024;
 	}
 
-	/*@Override
-	public String getSentryDsn() {
-		return "https://07dbef71fae765d2f336a17faaf1e441@o4508048573661184.ingest.us.sentry.io/4508052475674624";
-	}*/
-
 	@Override
 	public int getBuiltByBitId() {
 		return 44847;
+	}
+
+	@Override
+	public boolean isErrorReportingSupported() {
+		return true;
 	}
 
 	@Override
