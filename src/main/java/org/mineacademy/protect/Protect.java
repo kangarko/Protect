@@ -6,9 +6,9 @@ import org.mineacademy.fo.Common;
 import org.mineacademy.fo.FileUtil;
 import org.mineacademy.fo.filter.FilterWorld;
 import org.mineacademy.fo.model.HookManager;
+import org.mineacademy.fo.model.Task;
 import org.mineacademy.fo.platform.BukkitPlugin;
 import org.mineacademy.fo.platform.Platform;
-import org.mineacademy.fo.model.Task;
 import org.mineacademy.fo.region.DiskRegion;
 import org.mineacademy.fo.visual.VisualizedRegion;
 import org.mineacademy.protect.filter.FilterServer;
@@ -137,10 +137,10 @@ public final class Protect extends BukkitPlugin {
 		return 2024;
 	}
 
-	@Override
+	/*@Override
 	public String getSentryDsn() {
 		return "https://07dbef71fae765d2f336a17faaf1e441@o4508048573661184.ingest.us.sentry.io/4508052475674624";
-	}
+	}*/
 
 	@Override
 	public int getBuiltByBitId() {
