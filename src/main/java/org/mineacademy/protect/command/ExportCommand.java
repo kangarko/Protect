@@ -13,7 +13,7 @@ import org.mineacademy.fo.remain.CompMaterial;
 
 import com.google.gson.JsonObject;
 
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.mineacademy.fo.model.SimpleComponent;
 
 /**
  * The command to export items to a NBT string.
@@ -42,7 +42,7 @@ final class ExportCommand extends ProtectSubCommand {
 
 			if (flag.isEmpty())
 				this.tellSuccess(intro + "<hover:show_text:'<gold>Click to copy'><u><click:copy_to_clipboard:'"
-						+ MiniMessage.miniMessage().escapeTags(json.toString()) + "'>Click here to copy it to clipboard</click>.</u></hover>.");
+						+ SimpleComponent.escapeMiniMessageTags(json.toString()) + "'>Click here to copy it to clipboard</click>.</u></hover>.");
 
 			else if ("-console".equals(flag))
 				Common.log(intro + "Output: &f" + json);
