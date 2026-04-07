@@ -17,7 +17,8 @@ public enum ScanCause {
 	ITEM_SPAWN("item spawn"),
 	CREATIVE("creative"),
 	GAMEMODE_CHANGE("gamemode change"),
-	ITEM_PICKUP("item pickup");
+	ITEM_PICKUP("item pickup"),
+	PROJECTILE_LAUNCH("projectile launch");
 
 	@Getter
 	private final String key;

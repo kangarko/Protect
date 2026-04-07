@@ -140,6 +140,10 @@ public final class Rule extends ProtectOperator {
 			new RuleCheck(cause, location).checkSingleItem(item.getItemStack());
 	}
 
+	public static void filterProjectile(ScanCause cause, Location location, ItemStack item) {
+		new RuleCheck(cause, location).checkSingleItem(item);
+	}
+
 	public static void filterOpenContainer(ScanCause cause, Player player, @NonNull Inventory openContainer) {
 		filter(cause, player, openContainer, Remain.invokeOpenInventoryMethod(player, "getTitle"));
 	}

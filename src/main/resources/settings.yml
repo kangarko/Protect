@@ -64,6 +64,11 @@ Scan:
   # Scan when a player picks up an item? Disabled by default since it can be high-frequency.
   Item_Pickup: false
 
+  # Scan when a player throws a splash/lingering potion or shoots a tipped arrow?
+  # If the projectile matches a rule with "then confiscate", the throw/shot is cancelled.
+  # Prevents players from using hacked potions on others before inventory scan catches them.
+  Projectile_Launch: true
+
 # -------------------------------------------------------------------------------------------
 # Configure global rules when we should ignore scanning inventories.
 # -------------------------------------------------------------------------------------------

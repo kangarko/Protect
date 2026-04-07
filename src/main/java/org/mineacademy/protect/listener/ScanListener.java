@@ -1,7 +1,10 @@
 package org.mineacademy.protect.listener;
 
+import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -9,6 +12,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -202,6 +209,54 @@ public final class ScanListener implements Listener {
 			return;
 
 		Platform.runTask(1, () -> this.scanPlayerIf(ScanCause.CREATIVE, true, (Player) event.getWhoClicked()));
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onProjectileLaunch(ProjectileLaunchEvent event) {
+		if (!Settings.Scan.PROJECTILE_LAUNCH)
+			return;
+
+		final org.bukkit.entity.Entity entity = event.getEntity();
+		ItemStack item = null;
+
+		if (entity instanceof ThrownPotion)
+			item = ((ThrownPotion) entity).getItem();
+
+		else if (entity instanceof Arrow) {
+			final Arrow arrow = (Arrow) entity;
+
+			if (!arrow.hasCustomEffects())
+				return;
+
+			item = new ItemStack(Material.TIPPED_ARROW);
+			final PotionMeta meta = (PotionMeta) item.getItemMeta();
+
+			for (final PotionEffect effect : arrow.getCustomEffects())
+				meta.addCustomEffect(effect, true);
+
+			try {
+				meta.setBasePotionType(arrow.getBasePotionType());
+
+			} catch (final NoSuchMethodError err) {
+				// Older server versions
+			}
+
+			item.setItemMeta(meta);
+		}
+
+		if (item == null)
+			return;
+
+		try {
+			Rule.filterProjectile(ScanCause.PROJECTILE_LAUNCH, entity.getLocation(), item);
+
+		} catch (final CloneItemException | EventHandledException ex) {
+			event.setCancelled(true);
+			entity.remove();
+
+			if (entity.getShooter() instanceof Player)
+				Platform.runTask(1, () -> Rule.filterPlayer(ScanCause.PROJECTILE_LAUNCH, (Player) entity.getShooter()));
+		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
