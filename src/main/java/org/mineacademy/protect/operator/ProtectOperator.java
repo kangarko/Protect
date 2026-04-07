@@ -733,12 +733,13 @@ public abstract class ProtectOperator extends Operator {
 
 			if (operator.isCheckEnchantNotApplicable()) {
 				boolean ignore = true;
+				final List<Enchantment> notApplicable = new ArrayList<>();
 
 				for (final Enchantment enchant : enchants.keySet())
 					if (!enchant.canEnchantItem(this.item)) {
 						ignore = false;
 
-						break;
+						notApplicable.add(enchant);
 					}
 
 				if (ignore) {
@@ -746,6 +747,10 @@ public abstract class ProtectOperator extends Operator {
 
 					return false;
 				}
+
+				if (operator.isNerfEnchant())
+					for (final Enchantment enchant : notApplicable)
+						this.item.removeEnchantment(enchant);
 			}
 
 			if (operator.isCheckEnchantTooHigh()) {
