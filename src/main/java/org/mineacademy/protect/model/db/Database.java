@@ -1,7 +1,10 @@
 package org.mineacademy.protect.model.db;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 
+import org.mineacademy.fo.CommonCore;
 import org.mineacademy.fo.database.Row;
 import org.mineacademy.fo.database.SimpleDatabase;
 import org.mineacademy.fo.database.Table;
@@ -60,5 +63,15 @@ public final class Database extends SimpleDatabase {
 
 		for (final Table table : ProtectTable.values())
 			this.deleteOlderThan(table, timestamp);
+
+		if (this.isSQLite())
+			synchronized (this.getConnection()) {
+				try (Statement statement = this.getConnection().createStatement()) {
+					statement.execute("VACUUM");
+
+				} catch (final SQLException ex) {
+					CommonCore.error(ex, "Error running VACUUM on SQLite database");
+				}
+			}
 	}
 }
