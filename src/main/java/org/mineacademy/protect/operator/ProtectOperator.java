@@ -768,6 +768,8 @@ public abstract class ProtectOperator extends Operator {
 						if (operator.isNerfEnchant()) {
 							this.item.removeEnchantment(enchant);
 							this.item.addUnsafeEnchantment(enchant, enchant.getMaxLevel());
+
+							this.setModified(true);
 						}
 					}
 				}
@@ -1113,6 +1115,17 @@ public abstract class ProtectOperator extends Operator {
 					this.verbosePush(operator, "&cIllegal component(s) stripped.");
 					this.setModified(true);
 				}
+			}
+
+			if (operator.isNerfEnchant() && operator.isCheckEnchantNotApplicable()) {
+				this.verbosePush(operator, "&cNon-applicable enchantments removed.");
+				this.addLoggedItem(operator, this.item);
+
+				for (final Enchantment enchant : this.item.getEnchantments().keySet())
+					if (!enchant.canEnchantItem(this.item))
+						this.item.removeEnchantment(enchant);
+
+				this.setModified(true);
 			}
 
 			if (operator.isDisenchant()) {
