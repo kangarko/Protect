@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -243,7 +242,7 @@ public abstract class ProtectRow extends RowLocationDate {
 	 *
 	 * @param sender
 	 */
-	public final void saveIfSenderNotBypasses(@Nullable final CommandSender sender) {
+	public final void saveIfSenderNotBypasses(final CommandSender sender) {
 		if (sender == null || this.getBypassPermission() == null || !sender.hasPermission(this.getBypassPermission())) {
 			this.insertToQueue();
 

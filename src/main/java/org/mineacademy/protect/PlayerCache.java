@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
 
 import org.bukkit.entity.Player;
 import org.mineacademy.fo.visual.VisualizedRegion;
@@ -108,7 +107,7 @@ public final class PlayerCache {
 	 * @param key
 	 * @param object
 	 */
-	public void setRuleData(String key, @Nullable Object object) {
+	public void setRuleData(String key, Object object) {
 
 		if (object == null || object.toString().trim().equals("") || object.toString().equalsIgnoreCase("null"))
 			this.ruleData.remove(key);

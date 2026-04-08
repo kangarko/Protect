@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
 
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -67,7 +66,6 @@ public final class Rule extends ProtectOperator {
 	/**
 	 * Apply rules from the given group name
 	 */
-	@Nullable
 	private Group group;
 
 	/**
@@ -156,7 +154,7 @@ public final class Rule extends ProtectOperator {
 		filter(cause, player, null, null);
 	}
 
-	private static void filter(ScanCause cause, @NonNull Player player, @Nullable Inventory openContainer, @Nullable String inventoryTitle) {
+	private static void filter(ScanCause cause, @NonNull Player player, Inventory openContainer, String inventoryTitle) {
 		if (!player.isOnline()) {
 			Debugger.debug("scan", "Ignoring disconnected player " + player.getName());
 
@@ -218,14 +216,14 @@ public final class Rule extends ProtectOperator {
 			this.location = location;
 		}
 
-		protected RuleCheck(@NonNull ScanCause cause, @Nullable Player player) {
+		protected RuleCheck(@NonNull ScanCause cause, Player player) {
 			super(player);
 
 			this.cause = cause;
 			this.location = player.getLocation();
 		}
 
-		public void checkPlayerInventory(@Nullable Inventory extraContainer, @Nullable String inventoryTitle) {
+		public void checkPlayerInventory(Inventory extraContainer, String inventoryTitle) {
 			Valid.checkBoolean(this.hasPlayer, "Cannot check inventory without a player");
 
 			final List<ItemStack> combinedContent = new ArrayList<>();

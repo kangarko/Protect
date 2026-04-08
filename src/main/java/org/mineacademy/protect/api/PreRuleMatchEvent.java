@@ -1,6 +1,5 @@
 package org.mineacademy.protect.api;
 
-import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -27,7 +26,6 @@ public final class PreRuleMatchEvent extends SimpleEvent implements Cancellable 
 	/**
 	 * The player interacting with the item, null if none
 	 */
-	@Nullable
 	private final Player player;
 
 	/**
@@ -45,7 +43,7 @@ public final class PreRuleMatchEvent extends SimpleEvent implements Cancellable 
 	 */
 	private boolean cancelled;
 
-	public PreRuleMatchEvent(@Nullable Player player, ItemStack item, Rule rule) {
+	public PreRuleMatchEvent(Player player, ItemStack item, Rule rule) {
 		super(!Bukkit.isPrimaryThread());
 
 		this.player = player;

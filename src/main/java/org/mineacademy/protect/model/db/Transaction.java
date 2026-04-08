@@ -3,7 +3,6 @@ package org.mineacademy.protect.model.db;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -33,9 +32,7 @@ public final class Transaction extends ProtectRow implements HoldsItems {
 	private final String plugin;
 	private final Type type;
 	private final double price;
-	@Nullable
 	private final String shopOwnerName;
-	@Nullable
 	private final UUID shopOwnerUid;
 	private final ItemStack item;
 	private final int amount;

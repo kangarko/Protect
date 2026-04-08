@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
 
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
@@ -65,13 +64,11 @@ public abstract class Operator implements org.mineacademy.fo.model.Rule {
 	 * Permission required for the rule to apply,
 	 * message sent to player if he lacks it.
 	 */
-	@Nullable
 	private Tuple<String, SimpleComponent> requirePermission;
 
 	/**
 	 * JavaScript boolean output required to be true for the rule to apply
 	 */
-	@Nullable
 	private String requireScript;
 
 	/**
@@ -102,13 +99,11 @@ public abstract class Operator implements org.mineacademy.fo.model.Rule {
 	/**
 	 * Permission to bypass the rule
 	 */
-	@Nullable
 	private String ignorePermission;
 
 	/**
 	 * JavaScript boolean output when true for the rule to bypass
 	 */
-	@Nullable
 	private String ignoreScript;
 
 	/**
@@ -186,13 +181,11 @@ public abstract class Operator implements org.mineacademy.fo.model.Rule {
 	/**
 	 * Kick message that when set, rule will kick player
 	 */
-	@Nullable
 	private SimpleComponent kickMessage;
 
 	/**
 	 * The message that, if set, will show as a toast notification
 	 */
-	@Nullable
 	private ToastMessage toast;
 
 	/**
@@ -229,19 +222,16 @@ public abstract class Operator implements org.mineacademy.fo.model.Rule {
 	/**
 	 * Title and subtitle to send
 	 */
-	@Nullable
 	private TitleMessage title;
 
 	/**
 	 * The message on the action bar
 	 */
-	@Nullable
 	private SimpleComponent actionBar;
 
 	/**
 	 * The Boss bar message
 	 */
-	@Nullable
 	private BossBarMessage bossBar;
 
 	/**
@@ -693,13 +683,10 @@ public abstract class Operator implements org.mineacademy.fo.model.Rule {
 	@Getter(value = AccessLevel.PROTECTED)
 	public static abstract class OperatorCheck<T extends Operator> {
 
-		@Nullable
 		private final Player player;
 
-		@Nullable
 		private final FoundationPlayer audience;
 
-		@Nullable
 		private final PlayerCache cache;
 
 		protected final boolean hasPlayer;
@@ -710,7 +697,7 @@ public abstract class Operator implements org.mineacademy.fo.model.Rule {
 		 */
 		private final Set<String> alreadySentMessages = new HashSet<>();
 
-		protected OperatorCheck(@Nullable Player player) {
+		protected OperatorCheck(Player player) {
 			this.player = player;
 			this.audience = player != null ? Platform.toPlayer(player) : null;
 			this.cache = player != null ? PlayerCache.from(this.player) : null;
@@ -1178,7 +1165,7 @@ public abstract class Operator implements org.mineacademy.fo.model.Rule {
 		 * Cancels the pipeline by throwing a {@link EventHandledException}
 		 * and send an error message to the player
 		 */
-		private void cancel(boolean takenItems, @Nullable SimpleComponent errorMessage) {
+		private void cancel(boolean takenItems, SimpleComponent errorMessage) {
 			if (errorMessage != null && !errorMessage.toPlain().isEmpty() && this.hasPlayer)
 				Messenger.error(this.player, Variables.builder(this.audience).replaceComponent(errorMessage));
 

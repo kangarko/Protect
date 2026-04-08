@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -67,7 +65,6 @@ public class FastMatcher implements ConfigSerializable {
 	/**
 	 * Material names resolved from Minecraft tags (#tag syntax), null if no tags used
 	 */
-	@Nullable
 	private final Set<String> taggedMaterials;
 
 	/**
@@ -167,7 +164,6 @@ public class FastMatcher implements ConfigSerializable {
 	/**
 	 * Look up a Minecraft tag by name, trying items registry first, then blocks.
 	 */
-	@Nullable
 	private static Tag<Material> lookupTag(String tagName) {
 		if (tagName.isEmpty())
 			throw new FoException("Empty Minecraft tag name '#' in match pattern. Specify a tag name such as '#swords' or '#enchantable/armor'.", false);
