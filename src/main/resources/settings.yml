@@ -64,6 +64,15 @@ Scan:
   # Scan when a player picks up an item? Disabled by default since it can be high-frequency.
   Item_Pickup: false
 
+  # Scan when a player throws a splash/lingering potion or shoots a tipped arrow?
+  # If the projectile matches a rule, the throw/shot is cancelled and confiscated.
+  Projectile_Launch: true
+
+  # Per-player cooldown between scans. If a player was scanned within this window, further
+  # scan triggers are skipped. Prevents lag from high-frequency events like item pickups.
+  # Set to "none" to disable.
+  Cooldown: 5 seconds
+
 # -------------------------------------------------------------------------------------------
 # Configure global rules when we should ignore scanning inventories.
 # -------------------------------------------------------------------------------------------

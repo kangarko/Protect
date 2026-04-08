@@ -50,6 +50,8 @@ public final class Settings extends SimpleSettings {
 		public static Boolean GAMEMODE_CHANGE;
 		public static Boolean CREATIVE_CLICK;
 		public static Boolean ITEM_PICKUP;
+		public static Boolean PROJECTILE_LAUNCH;
+		public static SimpleTime COOLDOWN;
 
 		private static void init() {
 			setPathPrefix("Scan");
@@ -65,6 +67,8 @@ public final class Settings extends SimpleSettings {
 			GAMEMODE_CHANGE = getBoolean("Gamemode_Change");
 			CREATIVE_CLICK = getBoolean("Creative_Click");
 			ITEM_PICKUP = getBoolean("Item_Pickup");
+			PROJECTILE_LAUNCH = getBoolean("Projectile_Launch");
+			COOLDOWN = getTime("Cooldown");
 		}
 	}
 

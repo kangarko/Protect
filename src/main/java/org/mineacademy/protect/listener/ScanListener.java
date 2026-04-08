@@ -1,7 +1,13 @@
 package org.mineacademy.protect.listener;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -9,6 +15,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -36,6 +46,8 @@ import org.mineacademy.protect.settings.Settings;
  */
 @AutoRegister
 public final class ScanListener implements Listener {
+
+	private final Map<UUID, Long> lastScanTime = new HashMap<>();
 
 	/**
 	 * Scan when a player joins
@@ -155,8 +167,11 @@ public final class ScanListener implements Listener {
 
 		Platform.runTask(1, () -> {
 			for (final FastMatcher matcher : Settings.Scan.ITEM_USE)
-				if (matcher.find(materialName))
-					Rule.filterPlayer(ScanCause.ITEM_CLICK, player);
+				if (matcher.find(materialName)) {
+					this.scanPlayerIf(ScanCause.ITEM_CLICK, true, player);
+
+					return;
+				}
 		});
 	}
 
@@ -204,6 +219,55 @@ public final class ScanListener implements Listener {
 		Platform.runTask(1, () -> this.scanPlayerIf(ScanCause.CREATIVE, true, (Player) event.getWhoClicked()));
 	}
 
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onProjectileLaunch(ProjectileLaunchEvent event) {
+		if (!Settings.Scan.PROJECTILE_LAUNCH)
+			return;
+
+		final org.bukkit.entity.Projectile entity = event.getEntity();
+		ItemStack item = null;
+
+		if (entity instanceof ThrownPotion)
+			item = ((ThrownPotion) entity).getItem();
+
+		else if (entity instanceof Arrow) {
+			final Arrow arrow = (Arrow) entity;
+
+			if (!arrow.hasCustomEffects())
+				return;
+
+			item = new ItemStack(org.bukkit.Material.TIPPED_ARROW);
+			final PotionMeta meta = (PotionMeta) item.getItemMeta();
+
+			for (final PotionEffect effect : arrow.getCustomEffects())
+				meta.addCustomEffect(effect, true);
+
+			try {
+				meta.setBasePotionType(arrow.getBasePotionType());
+
+			} catch (final NoSuchMethodError err) {
+				// Older server versions
+			}
+
+			item.setItemMeta(meta);
+		}
+
+		if (item == null)
+			return;
+
+		try {
+			Rule.filterCause(ScanCause.PROJECTILE_LAUNCH, entity.getLocation(), item);
+
+		} catch (final CloneItemException | EventHandledException ex) {
+			if (ex instanceof CloneItemException || ((EventHandledException) ex).isCancelled()) {
+				event.setCancelled(true);
+
+				if (entity.getShooter() instanceof Player)
+					Platform.runTask(1, () -> Rule.filterPlayer(ScanCause.PROJECTILE_LAUNCH, (Player) entity.getShooter()));
+			}
+		}
+	}
+
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onItemPickup(EntityPickupItemEvent event) {
 		if (!(event.getEntity() instanceof Player))
@@ -231,8 +295,22 @@ public final class ScanListener implements Listener {
 	 * @param player
 	 */
 	private void scanPlayerIf(ScanCause cause, boolean enabled, Player player) {
-		if (enabled)
-			Rule.filterPlayer(cause, player);
+		if (!enabled)
+			return;
+
+		if (Settings.Scan.COOLDOWN.isEnabled()) {
+			final Long lastScan = this.lastScanTime.get(player.getUniqueId());
+
+			if (lastScan != null && Settings.Scan.COOLDOWN.isUnderLimitMs(lastScan)) {
+				Debugger.debug("scan", "Skipping scan for " + player.getName() + " (cooldown)");
+
+				return;
+			}
+
+			this.lastScanTime.put(player.getUniqueId(), System.currentTimeMillis());
+		}
+
+		Rule.filterPlayer(cause, player);
 	}
 
 }
