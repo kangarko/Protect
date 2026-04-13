@@ -164,15 +164,17 @@ public final class ScanListener implements Listener {
 			return;
 
 		final String materialName = CompMaterial.fromItem(event.getItem()).name();
+		boolean matches = false;
 
-		Platform.runTask(1, () -> {
-			for (final FastMatcher matcher : Settings.Scan.ITEM_USE)
-				if (matcher.find(materialName)) {
-					this.scanPlayerIf(ScanCause.ITEM_CLICK, true, player);
+		for (final FastMatcher matcher : Settings.Scan.ITEM_USE)
+			if (matcher.find(materialName)) {
+				matches = true;
 
-					return;
-				}
-		});
+				break;
+			}
+
+		if (matches)
+			Platform.runTask(1, () -> this.scanPlayerIf(ScanCause.ITEM_CLICK, true, player));
 	}
 
 	/**
