@@ -15,7 +15,7 @@ Example: 1.20.6: Getting NullPointerException error
 
 2) Provide steps to reproduce your problem.
 
-3) Type /protect debug and upload your ZIP file with your configuration - be sure to remove database password when you do.
+3) Type /protect debug and upload your ZIP file with your configuration - be sure to remove database password(s) when you do.
 
 Thank you. Please remove this text and write your actual issue below.
 -->
